@@ -9,18 +9,20 @@
   var I18N = {
     zh: {
       title: "联系我们 · wi.fs.kg",
-      desc: "给 wi.fs.kg 留一句话：域名查错了、接口想加字段、Bug 反馈都可以。不用注册，留言直接投到站长信箱，回信地址就是你自己填的邮箱。",
+      desc: "站内留言表单还没开通，不会假装已经发出。直接发邮件到 i@wi.fs.kg：域名查错了、接口想加字段、Bug 反馈都可以。",
       "lang.aria": "切换到英文",
       "lang.btn": "EN",
       back: "回到查询台",
-      eyebrow: "Contact · 直达信箱",
+      eyebrow: "Contact · 直接发信",
       "h1.pre": "有话直说，",
-      "h1.mark": "一封信",
+      "h1.mark": "一封邮件",
       "h1.post": "就到。",
-      lede: "域名查错了、接口想加字段、页面哪里不好用，或者只是想吐槽一句——都写在这里。<b class=\"nb\">不用注册、不用验证码</b>，留言会直接投到站长的信箱，回信地址就是你自己填的那个邮箱。",
-      "note.1": "<b>只送这一封信</b>：不会把你加进任何列表，也不会拿来发广告或做推送。",
-      "note.2": "<b>带上了必要的上下文</b>：为了让问题能对上号，留言会附带提交时的页面地址与浏览器标识，方便复现。",
-      "note.3": "<b>回信时间</b>：通常是看到就回，忙起来可能要一两天。技术问题请把复现步骤写清楚。",
+      lede: "这个部署还没有发信接口，页面不会假装留言已经送出。域名查错了、接口想加字段、页面不好用，直接写到 <b class=\"nb\">i@wi.fs.kg</b>。",
+      "note.1": "<b>没有发信接口</b>：这个站点不代发邮件。按钮会打开你自己的邮箱。",
+      "note.2": "<b>由你自己发出</b>：写完在邮件客户端里发送。本站不会显示「已经送到」。",
+      "note.3": "<b>回信时间</b>：通常是看到就回，忙起来可能要一两天。技术问题请把域名和复现步骤写在邮件里。",
+      "mailto.k": "发到这个地址",
+      "mailto.fine": "打开你的邮件应用，主题已写上 [wi.fs.kg]。正文请自己写，然后发送。",
       "tags.k": "快速起头",
       "tags.fine": "点一下会在留言框里带出提纲，按着填完直接发。",
       "tag.wrong": "数据不准",
@@ -81,22 +83,35 @@
         api: "想加的字段或能力：\n用在什么场景：\n示例域名：\n",
         bug: "出问题的页面：\n复现步骤：\n1. \n2. \n查询的域名：\n浏览器与系统：\n",
         other: "想说的：\n"
+      },
+      form: {
+        desc: "给 wi.fs.kg 留一句话：域名查错了、接口想加字段、Bug 反馈都可以。不用注册，留言直接投到站长信箱，回信地址就是你自己填的邮箱。",
+        eyebrow: "Contact · 直达信箱",
+        "h1.pre": "有话直说，",
+        "h1.mark": "一封信",
+        "h1.post": "就到。",
+        lede: "域名查错了、接口想加字段、页面哪里不好用，或者只是想吐槽一句——都写在这里。<b class=\"nb\">不用注册、不用验证码</b>，留言会直接投到站长的信箱，回信地址就是你自己填的那个邮箱。",
+        "note.1": "<b>只送这一封信</b>：不会把你加进任何列表，也不会拿来发广告或做推送。",
+        "note.2": "<b>带上了必要的上下文</b>：为了让问题能对上号，留言会附带提交时的页面地址与浏览器标识，方便复现。",
+        "note.3": "<b>回信时间</b>：通常是看到就回，忙起来可能要一两天。技术问题请把复现步骤写清楚。"
       }
     },
     en: {
       title: "Contact · wi.fs.kg",
-      desc: "Write to wi.fs.kg: a wrong WHOIS record, an API idea, or a bug. No account. The reply goes to the address you type.",
+      desc: "The contact form is not available on this deploy, and the page will not pretend a message was sent. Write to i@wi.fs.kg.",
       "lang.aria": "切换到中文",
       "lang.btn": "中文",
       back: "Back to lookup",
-      eyebrow: "Contact · straight to the inbox",
+      eyebrow: "Contact · email directly",
       "h1.pre": "Say it plain. ",
-      "h1.mark": "One letter",
+      "h1.mark": "One email",
       "h1.post": " gets there.",
-      lede: "A record came back wrong, the API is missing a field, a page is fighting you, or you just want to grumble — write it here. <b class=\"nb\">No account, no captcha</b>. The note goes straight to the maintainer, and the reply goes to the address you type.",
-      "note.1": "<b>Just this one letter</b>: you are not added to a list, and this is not used for ads or push.",
-      "note.2": "<b>Enough context to match it up</b>: the page address and browser come along, so a bug can be reproduced.",
-      "note.3": "<b>Reply time</b>: usually when it is seen, a day or two when things are busy. For anything technical, include the steps.",
+      lede: "This deploy has no mail API, so the page does not offer a form that cannot actually send. A wrong record, an API idea, or a bug — email <b class=\"nb\">i@wi.fs.kg</b>.",
+      "note.1": "<b>No mail API</b>: this site does not relay messages. The button opens your own mail app.",
+      "note.2": "<b>You send it</b>: write it there and send it yourself. This page will not say it was delivered.",
+      "note.3": "<b>Reply time</b>: usually when it is seen, a day or two when things are busy. For anything technical, include the domain and the steps.",
+      "mailto.k": "Write here",
+      "mailto.fine": "Opens your mail app with the subject set to [wi.fs.kg]. Write the body, then send it yourself.",
       "tags.k": "Start from",
       "tags.fine": "A tap drops an outline into the box. Fill it in and send.",
       "tag.wrong": "Wrong data",
@@ -157,6 +172,17 @@
         api: "Field or capability:\nWhere it would be used:\nExample domain:\n",
         bug: "Page:\nSteps to reproduce:\n1. \n2. \nDomain:\nBrowser and OS:\n",
         other: "Note:\n"
+      },
+      form: {
+        desc: "Write to wi.fs.kg: a wrong WHOIS record, an API idea, or a bug. No account. The reply goes to the address you type.",
+        eyebrow: "Contact · straight to the inbox",
+        "h1.pre": "Say it plain. ",
+        "h1.mark": "One letter",
+        "h1.post": " gets there.",
+        lede: "A record came back wrong, the API is missing a field, a page is fighting you, or you just want to grumble — write it here. <b class=\"nb\">No account, no captcha</b>. The note goes straight to the maintainer, and the reply goes to the address you type.",
+        "note.1": "<b>Just this one letter</b>: you are not added to a list, and this is not used for ads or push.",
+        "note.2": "<b>Enough context to match it up</b>: the page address and browser come along, so a bug can be reproduced.",
+        "note.3": "<b>Reply time</b>: usually when it is seen, a day or two when things are busy. For anything technical, include the steps."
       }
     }
   };
@@ -193,6 +219,9 @@
 
   function t(key) {
     var pack = I18N[state.lang] || I18N.zh;
+    if (state.ready && pack.form && Object.prototype.hasOwnProperty.call(pack.form, key)) {
+      return pack.form[key];
+    }
     return Object.prototype.hasOwnProperty.call(pack, key) ? pack[key] : key;
   }
 
@@ -291,8 +320,10 @@
     });
     var langBtn = $("langToggle");
     if (langBtn) langBtn.setAttribute("aria-label", t("lang.aria"));
-    var link = $("mailtoLink");
-    if (link) link.href = "mailto:" + INBOX + "?subject=" + encodeURIComponent(t("subject"));
+    var subject = encodeURIComponent(t("subject"));
+    Array.prototype.forEach.call(document.querySelectorAll("a[data-mailto]"), function (link) {
+      link.href = "mailto:" + INBOX + "?subject=" + subject;
+    });
     if (sendTxt && !state.sending) sendTxt.textContent = t("send");
     paintHint();
     paintNotice();
@@ -345,16 +376,45 @@
     }, 100);
   }
 
+  function showMailForm(on) {
+    state.ready = !!on;
+    var formEl = $("cform");
+    var card = $("mailtoCard");
+    var tags = $("contactTags");
+    var alt = $("cformAlt");
+    if (formEl) formEl.hidden = !state.ready;
+    if (card) card.hidden = state.ready;
+    if (tags) tags.hidden = !state.ready;
+    if (alt) alt.hidden = !state.ready;
+    applyI18n();
+  }
+
+  function loadTurnstile() {
+    if (window.turnstile && renderWidget()) return;
+    if (document.getElementById("cfTurnstile")) {
+      armBlockWatch();
+      return;
+    }
+    var script = document.createElement("script");
+    script.id = "cfTurnstile";
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.onload = function () { if (!renderWidget()) armBlockWatch(); };
+    document.head.appendChild(script);
+    armBlockWatch();
+  }
+
   function applyConfig(cfg) {
     state.cfgLoaded = true;
     state.siteKey = (cfg && cfg.siteKey) || "";
-    state.ready = !!(cfg && cfg.ready);
+    showMailForm(!!(cfg && cfg.ready));
+    if (!state.ready) return;
     var slot = $("tsSlot");
     var fallback = $("tsFallback");
     if (state.siteKey) {
       if (slot) slot.classList.remove("is-off");
       if (fallback) fallback.hidden = true;
-      if (!renderWidget()) armBlockWatch();
+      loadTurnstile();
     } else if (slot) {
       slot.classList.add("is-off");
       if (fallback) fallback.hidden = false;
@@ -427,6 +487,11 @@
     var name = nameEl.value.trim();
     var email = mailEl.value.trim();
     var message = msgEl.value.trim();
+
+    if (!state.ready) {
+      setState(t("err.NOT_CONFIGURED"), "err", "NOT_CONFIGURED");
+      return;
+    }
 
     if (!EMAIL_RE.test(email)) return bad(mailEl, "INVALID_EMAIL");
     if (message.length < 5) return bad(msgEl, "MESSAGE_TOO_SHORT");

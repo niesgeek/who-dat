@@ -221,7 +221,7 @@ The `/multi` endpoint accepts up to 10 domains per request by default. Set `MAX_
 
 ### Contact form
 
-`/contact` posts to `POST /api/contact`, which checks Cloudflare Turnstile and sends the note through [Resend](https://resend.com) to `i@wi.fs.kg`. The page still renders when these are unset; the endpoint then returns a JSON error and the form points at the mailto fallback.
+`/contact` leads with `mailto:i@wi.fs.kg` unless outbound mail is actually configured. The on-site form is shown only when `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, and `RESEND_API_KEY` are all set; then `POST /api/contact` checks Cloudflare Turnstile and sends the note through [Resend](https://resend.com) to `i@wi.fs.kg`. When they are unset, the page says the form is not available and does not pretend a message was sent.
 
 Set these on Vercel (Project → Settings → Environment Variables). Do not commit the values.
 

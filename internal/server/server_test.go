@@ -357,6 +357,82 @@ func TestFrontendShell(t *testing.T) {
 	}
 }
 
+func TestPublicSEOFilesAreNotLookups(t *testing.T) {
+	h := newTestServer(registered(), nil)
+	get := func(path string) *httptest.ResponseRecorder {
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, path, nil))
+		return rec
+	}
+
+	robots := get("/robots.txt")
+	if robots.Code != http.StatusOK {
+		t.Fatalf("robots status = %d, body %s", robots.Code, robots.Body)
+	}
+	if ct := robots.Header().Get("Content-Type"); !strings.Contains(ct, "text/plain") {
+		t.Errorf("robots content type = %q", ct)
+	}
+	robotsBody := robots.Body.String()
+	for _, want := range []string{"User-agent:", "Allow: /", "Disallow: /v1/", "Disallow: /api/", "Sitemap: https://wi.fs.kg/sitemap.xml"} {
+		if !strings.Contains(robotsBody, want) {
+			t.Errorf("robots.txt missing %q", want)
+		}
+	}
+	if strings.Contains(robotsBody, "UNSUPPORTED_TLD") || strings.Contains(robots.Header().Get("Content-Type"), "json") {
+		t.Fatalf("robots.txt was handled as a whois query: %s", robotsBody)
+	}
+
+	sitemap := get("/sitemap.xml")
+	if sitemap.Code != http.StatusOK {
+		t.Fatalf("sitemap status = %d, body %s", sitemap.Code, sitemap.Body)
+	}
+	if ct := sitemap.Header().Get("Content-Type"); !strings.Contains(ct, "xml") {
+		t.Errorf("sitemap content type = %q", ct)
+	}
+	siteBody := sitemap.Body.String()
+	for _, want := range []string{
+		"https://wi.fs.kg/</loc>",
+		"https://wi.fs.kg/contact</loc>",
+		"https://wi.fs.kg/docs</loc>",
+	} {
+		if !strings.Contains(siteBody, want) {
+			t.Errorf("sitemap missing %q", want)
+		}
+	}
+	if strings.Contains(siteBody, "UNSUPPORTED_TLD") || sitemap.Code == http.StatusNotImplemented {
+		t.Fatalf("sitemap.xml was handled as a whois query: %s", siteBody)
+	}
+
+	og := get("/og-image.png")
+	if og.Code != http.StatusOK {
+		t.Fatalf("og image status = %d", og.Code)
+	}
+	if ct := og.Header().Get("Content-Type"); ct != "image/png" {
+		t.Errorf("og image content type = %q", ct)
+	}
+	if !strings.HasPrefix(og.Body.String(), "\x89PNG") {
+		t.Fatal("og image is not a PNG")
+	}
+
+	home := get("/")
+	homeBody := home.Body.String()
+	for _, want := range []string{
+		`property="og:image" content="https://wi.fs.kg/og-image.png"`,
+		`name="twitter:card" content="summary_large_image"`,
+		`name="twitter:image" content="https://wi.fs.kg/og-image.png"`,
+	} {
+		if !strings.Contains(homeBody, want) {
+			t.Errorf("homepage missing %q", want)
+		}
+	}
+
+	// A dotted name that is not a published file still goes through lookup.
+	other := get("/not-a-page.txt")
+	if other.Code != http.StatusOK || !strings.Contains(other.Header().Get("Content-Type"), "json") {
+		t.Fatalf("unknown dotted path status/type = %d/%q", other.Code, other.Header().Get("Content-Type"))
+	}
+}
+
 func TestHealth(t *testing.T) {
 	rec := httptest.NewRecorder()
 	newTestServer(nil, nil).ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/health", nil))
