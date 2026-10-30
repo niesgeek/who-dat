@@ -58,7 +58,7 @@
       "done.again": "再写一封",
       "done.fallback": "你填的邮箱",
       "pn.lookup.t": "回查询台",
-      "pn.lookup.d": "查域名，注册状态、注册商、到期日一次摊开。",
+      "pn.lookup.d": "查域名，注册状态、注册商、到期日一次搞定。",
       "pn.docs.t": "接口文档",
       "pn.docs.d": "字段、错误码和调用示例都在这儿。",
       "pn.api.t": "终端接口",
