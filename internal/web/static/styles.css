@@ -1,4 +1,5 @@
-/* Paper, thick ink, hard offset. Latin faces are OFL (see /fonts). Chinese uses the system UI font. */
+/* Paper, thick ink, hard offset. Latin faces are OFL (see /fonts). Chinese uses the system UI font.
+   Day tokens live on :root. Night (html[data-theme="dark"]) repaints the same surfaces. */
 
 @font-face {
   font-family: "Space Grotesk";
@@ -230,6 +231,41 @@ svg { display: block; flex: none; }
 .lang-flag .flag-cn { display: none; }
 html[lang="en"] .lang-flag .flag-us { display: none; }
 html[lang="en"] .lang-flag .flag-cn { display: block; }
+
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--card);
+  border: var(--bd-sm) solid var(--ink);
+  border-radius: 999px;
+  box-shadow: var(--sh-xs);
+  line-height: 1;
+}
+.theme-switch button {
+  appearance: none;
+  position: relative;
+  border: 2px solid transparent;
+  background: transparent;
+  color: var(--ink-70);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.theme-switch button[aria-pressed="true"] {
+  background: var(--lime);
+  color: #141210;
+  border-color: var(--ink);
+}
+.theme-short { display: none; }
+.theme-short svg { display: block; }
 
 .dot {
   width: 9px;
@@ -1001,6 +1037,7 @@ html[lang="en"] .kv-2 { grid-template-columns: 1fr; }
   .nav a:hover,
   .bar-me:hover,
   .lang:hover,
+  .theme-switch button:hover,
   .chip:hover,
   .btn:hover:not(:disabled),
   .mini:hover:not(:disabled) {
@@ -1049,6 +1086,20 @@ html[lang="en"] .kv-2 { grid-template-columns: 1fr; }
   .tbl th:nth-child(5),
   .tbl td:nth-child(5) { display: none; }
   .bar-me { max-width: 46vw; font-size: 12px; padding: 6px 10px; }
+  .bar-side { flex-wrap: wrap; justify-content: flex-end; }
+  .theme-switch button { padding: 5px 7px; }
+  .theme-switch .theme-full {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .theme-switch .theme-short { display: grid; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1425,4 +1476,131 @@ html[lang="en"] .kv-2 { grid-template-columns: 1fr; }
   .cform-foot .btn { width: 100%; }
   .mailto-cta { width: 100%; }
   .cform-state { order: -1; }
+}
+
+/* ---------- night: neobrutalist dark ----------
+   Same borders, radii, and offsets as day. Ink flips to cream so panels
+   keep a hard edge on the charcoal canvas. Bright fills keep dark type. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  background: #12110e;
+  --paper: #12110e;
+  --paper-2: #1c1a16;
+  --card: #1a1815;
+  --ink: #f4efe6;
+  --ink-70: rgba(244, 239, 230, 0.78);
+  --ink-45: rgba(244, 239, 230, 0.64);
+  --ink-18: rgba(244, 239, 230, 0.18);
+  --violet-deep: #c4b6ff;
+  --sky-soft: #1a2740;
+  --lime-soft: #243018;
+  --on-accent: #141210;
+}
+
+html[data-theme="dark"] .term {
+  background: #0c0b0a;
+  border-color: var(--ink);
+}
+html[data-theme="dark"] .toast {
+  background: var(--lime);
+  color: var(--on-accent);
+  border: var(--bd-sm) solid var(--on-accent);
+  box-shadow: 4px 4px 0 var(--on-accent);
+}
+html[data-theme="dark"] ::selection { color: var(--on-accent); }
+html[data-theme="dark"] :focus-visible { outline-color: #9ec1ff; }
+
+html[data-theme="dark"] mark.hl,
+html[data-theme="dark"] .tl-key,
+html[data-theme="dark"] .badge,
+html[data-theme="dark"] .pill,
+html[data-theme="dark"] .ns-i,
+html[data-theme="dark"] .tbl th,
+html[data-theme="dark"] .noscript,
+html[data-theme="dark"] .cdone-ico,
+html[data-theme="dark"] .score-num {
+  color: var(--on-accent);
+  border-color: var(--on-accent);
+}
+html[data-theme="dark"] .badge { box-shadow: 2px 2px 0 var(--on-accent); }
+html[data-theme="dark"] .badge-grey {
+  color: var(--ink);
+  background: var(--paper-2);
+  border-color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+html[data-theme="dark"] .pill-wait {
+  color: var(--ink-45);
+  background: var(--paper-2);
+  border-color: var(--ink);
+}
+html[data-theme="dark"] .score-num.is-off { color: var(--ink); border-color: var(--ink); }
+html[data-theme="dark"] .score-num.is-wait { color: var(--ink-45); border-color: var(--ink); }
+html[data-theme="dark"] .tagline {
+  background: #ebf9c9;
+  color: #141210;
+  border-color: #141210;
+  box-shadow: 3px 3px 0 #141210;
+}
+html[data-theme="dark"] .tagline em { color: rgba(20, 18, 16, 0.62); }
+html[data-theme="dark"] .tagline .tl-sep { color: rgba(20, 18, 16, 0.4); }
+html[data-theme="dark"] .plate {
+  color: var(--on-accent);
+  border-color: var(--on-accent);
+  box-shadow: 4px 4px 0 var(--on-accent);
+}
+html[data-theme="dark"] .plate-sub.is-warn { color: #c2410c; }
+html[data-theme="dark"] .res-sub.is-warn { color: #ff8f6b; }
+html[data-theme="dark"] .dot-grey { background: #6b645a; }
+html[data-theme="dark"] .empty { border-color: rgba(244, 239, 230, 0.35); }
+html[data-theme="dark"] .cform-alt { border-color: rgba(244, 239, 230, 0.38); }
+html[data-theme="dark"] .signal.warn { background: #3a2e14; }
+html[data-theme="dark"] .btn:not(.btn-ghost) {
+  border-color: var(--on-accent);
+  box-shadow: 3px 3px 0 #ffc94d, 6px 6px 0 #3ec1ff;
+}
+html[data-theme="dark"] .btn-cream,
+html[data-theme="dark"] .btn-sum,
+html[data-theme="dark"] .btn-snap { color: var(--on-accent); }
+html[data-theme="dark"] .btn-primary { color: var(--cream); }
+html[data-theme="dark"] .btn:disabled { box-shadow: var(--sh-xs); }
+
+/* Teal brief stays a loud sticker: dark type, cream wells, cream offset. */
+html[data-theme="dark"] .card-snap {
+  --ink: #141210;
+  --ink-70: rgba(20, 18, 16, 0.72);
+  --ink-45: rgba(20, 18, 16, 0.5);
+  --ink-18: rgba(20, 18, 16, 0.22);
+  --paper: #f5efe1;
+  --paper-2: #efe7d5;
+  --card: #fffdf6;
+  --cream: #fff9ec;
+  --lime-soft: #ebf9c9;
+  --sky-soft: #eaf3ff;
+  --on-accent: #141210;
+  --sh: 6px 6px 0 #141210;
+  --sh-sm: 4px 4px 0 #141210;
+  --sh-xs: 3px 3px 0 #141210;
+  color: #141210;
+  border-color: #141210;
+  box-shadow: 6px 6px 0 #f4efe6;
+}
+html[data-theme="dark"] .card-snap .empty { border-color: rgba(20, 18, 16, 0.28); }
+
+@media (hover: hover) {
+  html[data-theme="dark"] .card-snap:hover { box-shadow: 8px 8px 0 #f4efe6; }
+  html[data-theme="dark"] .btn:not(.btn-ghost):hover:not(:disabled) {
+    box-shadow: 5px 5px 0 #ffc94d, 9px 9px 0 #3ec1ff;
+  }
+  html[data-theme="dark"] .btn:not(.btn-ghost):active:not(:disabled) {
+    box-shadow: 1px 1px 0 #141210;
+  }
+  html[data-theme="dark"] .mini:hover:not(:disabled) {
+    background: var(--lime);
+    color: #141210;
+    border-color: #141210;
+  }
+  html[data-theme="dark"] .back:hover,
+  html[data-theme="dark"] .ctag:hover,
+  html[data-theme="dark"] .cform-alt a:hover { color: #141210; }
 }

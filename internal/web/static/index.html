@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#F5EFE1" />
     <meta name="color-scheme" content="light" />
+    <script>
+      (function () {
+        var mode = "auto";
+        var prefersDark = false;
+        try {
+          var raw = localStorage.getItem("whois-ui-theme");
+          if (raw === "light" || raw === "dark" || raw === "auto") mode = raw;
+        } catch (e) {}
+        try { prefersDark = matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) {}
+        var dark = mode === "dark" || (mode !== "light" && prefersDark);
+        var root = document.documentElement;
+        root.setAttribute("data-theme", dark ? "dark" : "light");
+        root.setAttribute("data-theme-mode", mode);
+        var color = document.querySelector('meta[name="theme-color"]');
+        if (color) color.setAttribute("content", dark ? "#12110e" : "#F5EFE1");
+        var scheme = document.querySelector('meta[name="color-scheme"]');
+        if (scheme) scheme.setAttribute("content", dark ? "dark" : "light");
+      })();
+    </script>
     <meta name="robots" content="index, follow" />
     <meta name="description" content="输入域名，一次看清注册状态、注册商、到期日、名称服务器和联系人。RDAP 优先，WHOIS 兜底。免注册、无广告、无追踪脚本。" />
     <meta property="og:type" content="website" />
@@ -52,6 +71,20 @@
           <span class="dot dot-grey" id="barDot" aria-hidden="true"></span>
           <span id="barQuery">等待查询</span>
         </button>
+        <div class="theme-switch" id="themeSwitch" role="group" aria-label="主题">
+          <button type="button" data-theme-choice="auto" aria-pressed="true">
+            <span class="theme-full">自动</span>
+            <span class="theme-short" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13"><circle cx="8" cy="8" r="5.25" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path fill="currentColor" d="M8 2.75a5.25 5.25 0 0 0 0 10.5z"></path></svg></span>
+          </button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">
+            <span class="theme-full">浅色</span>
+            <span class="theme-short" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13"><circle cx="8" cy="8" r="2.3" fill="currentColor"></circle><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M12.8 3.2l-1.4 1.4M4.6 11.4l-1.4 1.4"></path></g></svg></span>
+          </button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">
+            <span class="theme-full">深色</span>
+            <span class="theme-short" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13"><path fill="currentColor" d="M9.4 1.7a5.5 5.5 0 1 0 4.8 8.1A4.5 4.5 0 1 1 9.4 1.7z"></path></svg></span>
+          </button>
+        </div>
         <button type="button" class="lang" id="langToggle" aria-label="切换到英文">
           <span class="lang-flag" aria-hidden="true">
             <svg class="flag flag-us" viewBox="0 0 22 14" width="22" height="14">
@@ -349,6 +382,7 @@
       </footer>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/theme.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>

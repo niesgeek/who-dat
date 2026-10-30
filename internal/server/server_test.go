@@ -330,7 +330,7 @@ func TestFrontendShell(t *testing.T) {
 		t.Fatalf("index status = %d", page.Code)
 	}
 	body := page.Body.String()
-	for _, want := range []string{"查一个域名", "/v1/whois/", "/styles.css", "/app.js", "favicon.svg"} {
+	for _, want := range []string{"查一个域名", "/v1/whois/", "/styles.css", "/app.js", "/theme.js", "favicon.svg", "whois-ui-theme", `id="themeSwitch"`, `data-theme-choice="dark"`} {
 		if !strings.Contains(body, want) {
 			t.Errorf("index missing %q", want)
 		}
@@ -344,6 +344,16 @@ func TestFrontendShell(t *testing.T) {
 	css := get("/styles.css")
 	if css.Code != http.StatusOK || !strings.Contains(css.Body.String(), "#f5efe1") {
 		t.Fatalf("styles.css status/body = %d / missing paper color", css.Code)
+	}
+	if !strings.Contains(css.Body.String(), `html[data-theme="dark"]`) {
+		t.Fatal("styles.css missing night theme")
+	}
+	if theme := get("/theme.js"); theme.Code != http.StatusOK || !strings.Contains(theme.Body.String(), "whois-ui-theme") || !strings.Contains(theme.Body.String(), "prefers-color-scheme") {
+		t.Fatalf("theme.js status = %d", theme.Code)
+	}
+	docs := get("/docs")
+	if docs.Code != http.StatusOK || !strings.Contains(docs.Body.String(), "whois-ui-theme") || !strings.Contains(docs.Body.String(), "/theme.js") {
+		t.Fatalf("docs status = %d, missing theme boot", docs.Code)
 	}
 	js := get("/app.js")
 	if js.Code != http.StatusOK || !strings.Contains(js.Body.String(), "/v1/whois/") || !strings.Contains(js.Body.String(), "/multi?domains=") {

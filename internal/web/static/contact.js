@@ -336,6 +336,10 @@
     applyI18n();
   }
 
+  function widgetTheme() {
+    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  }
+
   function renderWidget() {
     if (!state.siteKey || !window.turnstile || typeof window.turnstile.render !== "function") return false;
     var slot = $("tsWidget");
@@ -344,13 +348,15 @@
       try { window.turnstile.remove(state.widgetId); } catch (e) { /* already gone */ }
       state.widgetId = null;
     }
+    var chosen = widgetTheme();
     try {
       state.widgetId = window.turnstile.render(slot, {
         sitekey: state.siteKey,
-        theme: "light",
+        theme: chosen,
         size: "flexible",
         language: state.lang === "en" ? "en" : "zh-cn"
       });
+      state.widgetTheme = chosen;
     } catch (e) {
       state.tsBlocked = true;
       paintHint();
@@ -575,6 +581,11 @@
 
   $("langToggle").addEventListener("click", function () {
     setLang(state.lang === "en" ? "zh" : "en");
+  });
+
+  document.addEventListener("widat-theme", function () {
+    if (state.widgetId == null || state.widgetTheme === widgetTheme()) return;
+    renderWidget();
   });
 
   fetch("/api/contact/config").then(function (r) {
