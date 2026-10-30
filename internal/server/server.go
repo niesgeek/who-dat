@@ -88,6 +88,12 @@ func (s *server) routes() http.Handler {
 	mux.HandleFunc("GET /docs", s.handleDocs)
 	mux.HandleFunc("GET /openapi.yaml", s.handleOpenAPI)
 	mux.HandleFunc("GET /contact", s.handleContactPage)
+	// SEO files are registered before the bare-domain catch-all. A name like
+	// robots.txt parses as a registrable domain (public-suffix "*"), so leaving
+	// it to /{domain} returns UNSUPPORTED_TLD instead of the file.
+	mux.HandleFunc("GET /robots.txt", s.handleRobots)
+	mux.HandleFunc("GET /sitemap.xml", s.handleSitemap)
+	mux.HandleFunc("GET /og-image.png", s.handleOGImage)
 	mux.HandleFunc("GET /api/contact/config", s.handleContactConfig)
 	mux.HandleFunc("POST /api/contact", s.handleContact)
 	mux.HandleFunc("GET /api/contact", s.handleContactMethod)

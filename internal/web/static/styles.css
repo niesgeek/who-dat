@@ -1084,7 +1084,8 @@ html[lang="en"] .kv-2 { grid-template-columns: 1fr; }
   letter-spacing: -0.01em;
   margin: 10px 0 14px;
 }
-.pg-title mark { white-space: nowrap; }
+.pg-title mark,
+.pg-title .h1-rest { white-space: nowrap; }
 .pg-lede {
   font-size: 15px;
   line-height: 1.75;
@@ -1340,6 +1341,36 @@ html[lang="en"] .kv-2 { grid-template-columns: 1fr; }
 }
 .cform-alt a:hover { background: var(--lime); }
 
+.mailto-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+  padding: clamp(18px, 2.2vw, 26px);
+  background: var(--card);
+  border: var(--bd) solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: var(--sh);
+}
+.mailto-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-45);
+}
+.mailto-cta {
+  font-family: var(--mono);
+  font-size: clamp(16px, 2vw, 20px);
+  letter-spacing: -0.02em;
+  padding: 14px 18px;
+  text-decoration: none;
+  max-width: 100%;
+}
+.mailto-card .fine { max-width: 42ch; }
+
 .pg-next {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1392,5 +1423,6 @@ html[lang="en"] .kv-2 { grid-template-columns: 1fr; }
   .pg-title { font-size: clamp(28px, 8vw, 36px); }
   .cform-row { grid-template-columns: 1fr; }
   .cform-foot .btn { width: 100%; }
+  .mailto-cta { width: 100%; }
   .cform-state { order: -1; }
 }

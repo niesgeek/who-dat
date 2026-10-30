@@ -117,6 +117,30 @@ func (s *server) handleContactPage(w http.ResponseWriter, r *http.Request) {
 	s.files.ServeHTTP(w, r)
 }
 
+// handleRobots serves robots.txt. Registered explicitly so the catch-all lookup
+// does not treat the filename as a domain.
+func (s *server) handleRobots(w http.ResponseWriter, r *http.Request) {
+	s.servePublicFile(w, r, "/robots.txt")
+}
+
+// handleSitemap serves sitemap.xml ahead of the bare-domain lookup.
+func (s *server) handleSitemap(w http.ResponseWriter, r *http.Request) {
+	s.servePublicFile(w, r, "/sitemap.xml")
+}
+
+// handleOGImage serves the homepage Open Graph image ahead of the bare-domain lookup.
+func (s *server) handleOGImage(w http.ResponseWriter, r *http.Request) {
+	s.servePublicFile(w, r, "/og-image.png")
+}
+
+// servePublicFile sends an embedded asset with a shared cache header. The path is
+// rooted at the static filesystem, the same way /docs and /contact are.
+func (s *server) servePublicFile(w http.ResponseWriter, r *http.Request, path string) {
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	r.URL.Path = path
+	s.files.ServeHTTP(w, r)
+}
+
 // handleOpenAPI serves the OpenAPI specification.
 func (s *server) handleOpenAPI(w http.ResponseWriter, r *http.Request) {
 	r.URL.Path = "/openapi.yaml"

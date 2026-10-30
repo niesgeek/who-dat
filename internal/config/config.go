@@ -26,8 +26,9 @@ type Config struct {
 	// serves repeats without re-invoking the function. Empty disables it.
 	CDNCacheControl string
 
-	// Contact form (/contact). Keys stay empty when unset; the page still renders
-	// and POST /api/contact returns a JSON error pointing at the mailto fallback.
+	// Contact (/contact). With no mail API the page leads with mailto:i@wi.fs.kg.
+	// The form is shown only when Turnstile and Resend are both configured;
+	// otherwise POST /api/contact returns a JSON error naming that inbox.
 	TurnstileSiteKey   string // public, exposed by GET /api/contact/config
 	TurnstileSecretKey string // server-side Turnstile siteverify
 	ResendAPIKey       string // Resend bearer token

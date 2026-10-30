@@ -57,8 +57,14 @@ func TestContactPageIsNotALookup(t *testing.T) {
 	body := page.Body.String()
 	for _, want := range []string{
 		"有话直说",
-		"一封信",
+		"一封邮件",
+		"还没有发信接口",
+		"不会假装留言已经送出",
+		`id="mailtoCard"`,
+		`id="cform" hidden`,
+		`id="contactTags" hidden`,
 		contactInbox,
+		"mailto:" + contactInbox,
 		"/contact.js",
 		"/styles.css",
 		"回到查询台",
@@ -70,6 +76,9 @@ func TestContactPageIsNotALookup(t *testing.T) {
 			t.Errorf("contact page missing %q", want)
 		}
 	}
+	if strings.Contains(body, "challenges.cloudflare.com/turnstile") {
+		t.Error("contact page must not load Turnstile before mail is ready")
+	}
 	if strings.Contains(body, "0x4AAAAA") {
 		t.Error("contact page must not hardcode a Turnstile site key")
 	}
@@ -80,7 +89,16 @@ func TestContactPageIsNotALookup(t *testing.T) {
 	if js.Code != http.StatusOK {
 		t.Fatalf("contact.js status = %d", js.Code)
 	}
-	for _, want := range []string{"whois-ui-lang", "[wi.fs.kg] 来自联系页面", "RDAP 或 WHOIS", "\"/api/contact\""} {
+	for _, want := range []string{
+		"whois-ui-lang",
+		"[wi.fs.kg] 来自联系页面",
+		"RDAP 或 WHOIS",
+		"\"/api/contact\"",
+		"没有发信接口",
+		"The contact form is not available",
+		"showMailForm",
+		"formEl.hidden = !state.ready",
+	} {
 		if !strings.Contains(script, want) {
 			t.Errorf("contact.js missing %q", want)
 		}
