@@ -135,6 +135,7 @@ type Report struct {
 	Propagation Propagation `json:"propagation"`
 	DNSSEC      DNSSEC      `json:"dnssec"`
 	Nameservers Nameservers `json:"nameservers"`
+	Path        Path        `json:"path"`
 	Disclaimer  string      `json:"disclaimer"`
 }
 
@@ -145,4 +146,5 @@ type LabInput struct {
 	Server    string
 	Timeout   time.Duration // per-probe budget; 0 uses 2s
 	Resolvers []Resolver
+	Client    ClientHint
 }
