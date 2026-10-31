@@ -155,6 +155,12 @@ func TestLabSignedAndConsistent(t *testing.T) {
 	if !sawA {
 		t.Fatalf("records = %+v", rep.Records)
 	}
+	if rep.Path.Badge != "complete" || rep.Path.Nodes[2].Code != "aa" || rep.Path.Nodes[2].Serial == nil || *rep.Path.Nodes[2].Serial != 202 {
+		t.Fatalf("path = %+v", rep.Path)
+	}
+	if rep.Path.Nodes[1].State != "ok" || rep.Path.Nodes[3].Code != "ds" || rep.Path.Nodes[4].Code != "anchor" {
+		t.Fatalf("path nodes = %+v", rep.Path.Nodes)
+	}
 	if rep.Propagation.Baseline != "authoritative" || rep.Propagation.Match != 2 {
 		t.Fatalf("prop = %+v", rep.Propagation)
 	}
