@@ -10,6 +10,7 @@ import (
 
 	"github.com/lissy93/who-dat/internal/cache"
 	"github.com/lissy93/who-dat/internal/config"
+	"github.com/lissy93/who-dat/internal/dnsq"
 	"github.com/lissy93/who-dat/internal/lookup"
 	"github.com/lissy93/who-dat/internal/rdap"
 	"github.com/lissy93/who-dat/internal/web"
@@ -21,6 +22,7 @@ type server struct {
 	svc          *lookup.Service
 	files        http.Handler
 	lookupAPI    http.Handler // bare-domain lookup with API middleware applied
+	dns          dnsq.Querier
 	httpClient   *http.Client
 	turnstileURL string
 	resendURL    string
@@ -62,6 +64,7 @@ func newServer(cfg *config.Config, svc *lookup.Service) *server {
 		cfg:          cfg,
 		svc:          svc,
 		files:        http.FileServer(http.FS(web.FS())),
+		dns:          dnsq.New(cfg.DNSTimeout),
 		httpClient:   &http.Client{Timeout: 15 * time.Second},
 		turnstileURL: "https://challenges.cloudflare.com/turnstile/v0/siteverify",
 		resendURL:    "https://api.resend.com/emails",
@@ -88,6 +91,10 @@ func (s *server) routes() http.Handler {
 	mux.HandleFunc("GET /docs", s.handleDocs)
 	mux.HandleFunc("GET /openapi.yaml", s.handleOpenAPI)
 	mux.HandleFunc("GET /contact", s.handleContactPage)
+	mux.HandleFunc("GET /dns", s.handleDNSPage)
+	mux.Handle("GET /api/dns/lab", api(s.handleDNSLab))
+	mux.Handle("GET /api/dns", api(s.handleDNS))
+	mux.HandleFunc("GET /api/whoami", s.handleWhoami)
 	// SEO files are registered before the bare-domain catch-all. A name like
 	// robots.txt parses as a registrable domain (public-suffix "*"), so leaving
 	// it to /{domain} returns UNSUPPORTED_TLD instead of the file.

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#F5EFE1" />
+    <meta name="color-scheme" content="light" />
+    <script>
+      (function () {
+        var mode = "auto";
+        var prefersDark = false;
+        try {
+          var raw = localStorage.getItem("whois-ui-theme");
+          if (raw === "light" || raw === "dark" || raw === "auto") mode = raw;
+        } catch (e) {}
+        try { prefersDark = matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) {}
+        var dark = mode === "dark" || (mode !== "light" && prefersDark);
+        var root = document.documentElement;
+        root.setAttribute("data-theme", dark ? "dark" : "light");
+        root.setAttribute("data-theme-mode", mode);
+        var color = document.querySelector('meta[name="theme-color"]');
+        if (color) color.setAttribute("content", dark ? "#12110e" : "#F5EFE1");
+        var scheme = document.querySelector('meta[name="color-scheme"]');
+        if (scheme) scheme.setAttribute("content", dark ? "dark" : "light");
+      })();
+    </script>
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="在 wi.fs.kg 上查看一个名字的 DNS 记录、各公共解析器是否一致、权威 SOA 序列号，以及 DNSSEC 记录是否都在。这里不校验签名。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:url" content="https://wi.fs.kg/dns" />
+    <meta property="og:title" content="wi.fs.kg — DNS 查询" />
+    <meta property="og:description" content="记录、传播、权威序列号、DNSSEC 记录是否都在。不校验签名。" />
+    <link rel="canonical" href="https://wi.fs.kg/dns" />
+    <title>wi.fs.kg — DNS 查询</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page-dns">
+    <header class="bar">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#FFF9EC" stroke-width="2.4" stroke-linecap="round">
+            <circle cx="10.5" cy="10.5" r="6.2"></circle>
+            <path d="M15.2 15.2 L20 20"></path>
+          </svg>
+        </span>
+        <span class="brand-txt">wi.fs.kg</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="/" data-i18n="nav.whois">WHOIS</a>
+        <a href="/dns" aria-current="page">DNS</a>
+        <a href="/contact" data-i18n="nav.contact">联系</a>
+        <a href="/docs" data-i18n="nav.docs">文档</a>
+      </nav>
+      <div class="bar-side">
+        <div class="theme-switch" id="themeSwitch" role="group" aria-label="主题">
+          <button type="button" data-theme-choice="auto" aria-pressed="true">
+            <span class="theme-full">自动</span>
+            <span class="theme-short" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13"><circle cx="8" cy="8" r="5.25" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path fill="currentColor" d="M8 2.75a5.25 5.25 0 0 0 0 10.5z"></path></svg></span>
+          </button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">
+            <span class="theme-full">浅色</span>
+            <span class="theme-short" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13"><circle cx="8" cy="8" r="2.3" fill="currentColor"></circle><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M12.8 3.2l-1.4 1.4M4.6 11.4l-1.4 1.4"></path></g></svg></span>
+          </button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">
+            <span class="theme-full">深色</span>
+            <span class="theme-short" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13"><path fill="currentColor" d="M9.4 1.7a5.5 5.5 0 1 0 4.8 8.1A4.5 4.5 0 1 1 9.4 1.7z"></path></svg></span>
+          </button>
+        </div>
+        <button type="button" class="lang" id="langToggle" aria-label="切换到英文">
+          <span data-i18n="lang.btn">EN</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <noscript>
+        <p class="noscript">页面需要 JavaScript。接口本身不需要浏览器：<code class="url">/api/dns?name=example.com&amp;type=A</code></p>
+      </noscript>
+
+      <section class="card card-hero" id="lookup">
+        <p class="eyebrow"><span class="sq sq-violet" aria-hidden="true"></span><span data-i18n="eyebrow">DNS · 记录 · 传播 · 权威</span></p>
+        <h1 class="h1">
+          <span data-i18n="h1.l1">问一个名字，</span><br />
+          <mark class="hl hl-pink" data-i18n="h1.a">记录、</mark>
+          <mark class="hl hl-sky" data-i18n="h1.b">传播、</mark>
+          <mark class="hl hl-lime" data-i18n="h1.c">序列号</mark>
+        </h1>
+        <p class="lede" data-i18n="lede">从这台服务器向公共递归解析器和该域的权威服务器发查询。下划线名字可以，比如 _dmarc。响应不入库，Cache-Control 是 no-store。</p>
+
+        <form class="search" id="dnsForm">
+          <label class="sr-only" for="q" data-i18n="label.q">域名或 IP</label>
+          <input id="q" name="q" type="text" inputmode="url" autocomplete="off" spellcheck="false" maxlength="253" placeholder="example.com" value="" />
+          <div class="search-actions">
+            <button class="btn btn-cream" type="button" id="clearBtn" data-i18n="btn.clear">清空</button>
+            <button class="btn btn-primary" type="submit" id="searchBtn" data-i18n="btn.search">查询</button>
+          </div>
+        </form>
+        <div class="chips" id="typeChips" role="group" aria-label="DNS type"></div>
+        <p class="status" id="status" role="status" data-i18n="status.idle">输入 example.com，或点一个类型。</p>
+        <div class="chips">
+          <span class="chips-label" data-i18n="chips.label">试试</span>
+          <button type="button" class="chip" data-domain="example.com">example.com</button>
+          <button type="button" class="chip" data-domain="_dmarc.example.com">_dmarc.example.com</button>
+          <button type="button" class="chip" data-domain="1.1.1.1">1.1.1.1</button>
+        </div>
+      </section>
+
+      <aside class="card card-me" id="whoami">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="me.title">这条连接</span></h2>
+          <span class="badge badge-grey" id="meBadge" data-i18n="me.badge">连接</span>
+        </div>
+        <p class="fine" data-i18n="me.note">只读这次 HTTP 连接和主机已经附上的头。没有第三方地理查询。</p>
+        <dl class="kv" id="meKv"></dl>
+      </aside>
+
+      <section class="card card-span" id="records">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="rec.title">记录</span></h2>
+          <span class="badge badge-grey" id="recBadge">—</span>
+        </div>
+        <div id="recBody">
+          <div class="empty"><strong data-i18n="rec.empty">还没有记录</strong><p data-i18n="rec.empty2">查询之后，这里按类型、名字、值和 TTL 列出。</p></div>
+        </div>
+      </section>
+
+      <section class="card card-span" id="prop">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="prop.title">传播</span></h2>
+          <button type="button" class="mini" id="propAgain" data-i18n="prop.again" disabled>再问一次</button>
+        </div>
+        <p class="fine" data-i18n="prop.note">递归解析器用 RD=1。权威服务器用 RD=0。耗时从这台服务器量起，含握手。多地址或分线路时，有交集算部分一致，不算故障。</p>
+        <div id="propBody">
+          <div class="empty"><strong data-i18n="prop.empty">等待查询</strong></div>
+        </div>
+      </section>
+
+      <section class="card card-half" id="dnssec">
+        <div class="card-head">
+          <h2 class="h2">DNSSEC</h2>
+          <span class="badge badge-grey" id="secBadge">—</span>
+        </div>
+        <p class="fine" id="secDisclaimer">DNSSEC results report whether DS, DNSKEY, and RRSIG records are present and whether a resolver set the AD bit. Signatures are not checked here. A complete chain is not a validated signature.</p>
+        <div id="secBody">
+          <div class="empty"><strong data-i18n="sec.empty">查询后看记录在不在</strong></div>
+        </div>
+      </section>
+
+      <section class="card card-half" id="ns">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="ns.title">权威与 SOA</span></h2>
+          <span class="badge badge-grey" id="nsBadge">—</span>
+        </div>
+        <div id="nsBody">
+          <div class="empty"><strong data-i18n="ns.empty">查询后比较每台权威的序列号</strong></div>
+        </div>
+      </section>
+
+      <section class="card card-span" id="deleg">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="del.title">委托是否一致</span></h2>
+        </div>
+        <p class="fine" data-i18n="del.note">父区委托是递归解析器看到的 NS。子区自报是从一台置了 AA 的权威上用 RD=0 问到的 NS。</p>
+        <div id="delBody"></div>
+      </section>
+
+      <section class="card card-half" id="howto">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="how.title">怎么一起看</span></h2>
+        </div>
+        <details class="qa" open>
+          <summary data-i18n="how.mail.q">邮件</summary>
+          <p data-i18n="how.mail.a">看 MX，再看 TXT 里的 SPF，以及 _dmarc 这个名字上的 TXT。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="how.acme.q">证书校验</summary>
+          <p data-i18n="how.acme.a">看 _acme-challenge 上的 TXT。名字里的下划线是合法的。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="how.hijack.q">怀疑应答被换过</summary>
+          <p data-i18n="how.hijack.a">看 DS、DNSKEY、RRSIG 是否都在，以及验证型解析器有没有置 AD。记录都在不等于签名有效。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="how.ns.q">正在换名称服务器</summary>
+          <p data-i18n="how.ns.a">看每台权威的 SOA 序列号是否一致，再看父区委托和子区自报的 NS 是不是同一组。</p>
+        </details>
+      </section>
+
+      <section class="card card-half" id="api">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="api.title">命令行</span></h2>
+        </div>
+        <p class="lede lede-sm" data-i18n="api.lede">curl 的 User-Agent 得到 dig 风格的文本。浏览器和 Accept: application/json 得到 JSON。format=json 或 format=text 可以强制。</p>
+        <pre class="raw" id="curlBox">curl "/api/dns?name=example.com&amp;type=A"</pre>
+        <p class="fine">/api/dns?name=&amp;type=&amp;server=&amp;dnssec=&amp;rd=&amp;timeout=</p>
+      </section>
+    </main>
+
+    <div class="foot-wrap">
+      <footer class="foot">
+        <div class="foot-l">
+          <span class="brand-mark sm" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FFF9EC" stroke-width="2.4" stroke-linecap="round">
+              <circle cx="10.5" cy="10.5" r="6.2"></circle>
+              <path d="M15.2 15.2 L20 20"></path>
+            </svg>
+          </span>
+          <strong class="brand-txt">wi.fs.kg</strong>
+          <span class="foot-sep" aria-hidden="true">·</span>
+          <span data-i18n="foot.blurb">WHOIS 与 DNS</span>
+        </div>
+        <div class="foot-r">
+          <a class="foot-link" href="/">WHOIS</a>
+          <span class="foot-sep" aria-hidden="true">·</span>
+          <a class="foot-link" href="/dns">DNS</a>
+          <span class="foot-sep" aria-hidden="true">·</span>
+          <a class="foot-link" href="/contact" data-i18n="nav.contact">联系</a>
+          <span class="foot-sep" aria-hidden="true">·</span>
+          <a class="foot-link" href="/docs" data-i18n="nav.docs">文档</a>
+        </div>
+      </footer>
+    </div>
+    <script src="/theme.js"></script>
+    <script src="/dns.js"></script>
+  </body>
+</html>

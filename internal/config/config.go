@@ -36,6 +36,10 @@ type Config struct {
 	// ContactRatePerMinute is the per-IP budget for POST /api/contact. <= 0 disables it.
 	ContactRatePerMinute int
 	ContactRateBurst     int
+
+	// DNS laboratory (/dns, /api/dns). The server dials public resolvers itself.
+	DNSServer  string        // default recursive resolver for record lists and DNSSEC
+	DNSTimeout time.Duration // per-query timeout for GET /api/dns
 }
 
 // DefaultContactFrom is the Resend sandbox sender used when CONTACT_FROM is unset.
@@ -66,6 +70,8 @@ func Load() *Config {
 		ContactFrom:          env("CONTACT_FROM", DefaultContactFrom),
 		ContactRatePerMinute: intEnv("CONTACT_RATE_PER_MINUTE", 5),
 		ContactRateBurst:     intEnv("CONTACT_RATE_BURST", 3),
+		DNSServer:            env("DNS_SERVER", "8.8.8.8"),
+		DNSTimeout:           time.Duration(intEnv("DNS_TIMEOUT_MS", 4000)) * time.Millisecond,
 	}
 }
 

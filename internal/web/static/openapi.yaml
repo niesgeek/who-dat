@@ -70,6 +70,71 @@ paths:
                   results:
                     type: array
                     items: { $ref: "#/components/schemas/Result" }
+  /api/dns:
+    get:
+      summary: Query one DNS name
+      description: >
+        Asks a public resolver or authoritative server from this process.
+        curl and wget receive dig-style text. Browsers and
+        `Accept: application/json` receive JSON. `format=text` or
+        `format=json` overrides that. Responses are `Cache-Control: no-store`.
+        Server addresses must be public. ANY and AXFR are rejected.
+      operationId: dnsQuery
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema: { type: string, example: example.com }
+          description: Hostname, underscore name, wildcard, or IP (rewritten to a reverse name).
+        - name: type
+          in: query
+          schema: { type: string, default: A, example: A }
+          description: A, AAAA, CNAME, MX, TXT, NS, SOA, CAA, SRV, PTR, DS, DNSKEY, or RRSIG.
+        - name: server
+          in: query
+          schema: { type: string, default: 8.8.8.8 }
+          description: Public resolver IP or hostname. Defaults to DNS_SERVER or 8.8.8.8.
+        - name: dnssec
+          in: query
+          schema: { type: string, default: "1" }
+          description: Set the EDNS DO bit unless this is 0, false, no, or off.
+        - name: rd
+          in: query
+          schema: { type: string, default: "1" }
+          description: Recursion desired. Use 0 when asking an authoritative server.
+        - name: timeout
+          in: query
+          schema: { type: integer, default: 4000, minimum: 200, maximum: 8000 }
+          description: Per-query budget in milliseconds.
+        - name: format
+          in: query
+          schema: { type: string, enum: [json, text] }
+      responses:
+        "200":
+          description: DNS response. JSON for browsers, text for curl.
+        "400": { $ref: "#/components/responses/Error" }
+        "502": { $ref: "#/components/responses/Error" }
+        "504": { $ref: "#/components/responses/Error" }
+  /api/dns/lab:
+    get:
+      summary: DNS laboratory report
+      description: >
+        Records for the common types, a propagation matrix, per-server SOA
+        serials, parent versus child NS names, and a DNSSEC presence check.
+        `cryptoValidation` is always false. A complete chain is not a
+        validated signature.
+      operationId: dnsLab
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema: { type: string, example: example.com }
+        - name: type
+          in: query
+          schema: { type: string, default: ALL }
+      responses:
+        "200":
+          description: Laboratory report as JSON.
   /health:
     get:
       summary: Health check

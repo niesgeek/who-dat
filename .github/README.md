@@ -120,6 +120,31 @@ curl "https://who-dat.as93.net/multi?domains=example.com,example.net"
 
 </details>
 
+<details>
+  <summary><h4>DNS query <code>/api/dns</code></h4></summary>
+
+The same server can ask public DNS resolvers. The web page is `/dns`. WHOIS stays on `/`.
+
+- **URL**: `/api/dns`
+- **Method**: `GET`
+- **Query Params**:
+  - **name** (required): hostname, underscore name such as `_dmarc.example.com`, wildcard, or an IP (turned into a reverse name)
+  - **type**: `A` `AAAA` `CNAME` `MX` `TXT` `NS` `SOA` `CAA` `SRV` `PTR` `DS` `DNSKEY` `RRSIG`. Default `A`. `ANY` and `AXFR` are rejected.
+  - **server**: public resolver IP or hostname. Default `8.8.8.8` (or `DNS_SERVER`)
+  - **dnssec**: `1` (default) sets the EDNS DO bit; `0` turns it off
+  - **rd**: `1` (default) asks for recursion; use `0` for an authoritative server
+  - **timeout**: milliseconds, clamped to 200–8000
+  - **format**: `json` or `text`. Without it, `curl` and `wget` get dig-style text and browsers get JSON
+- **Notes**: responses send `Cache-Control: no-store`. The server refuses loopback, private, and documentation addresses. UDP answers that are truncated are retried over TCP.
+- **Laboratory**: `GET /api/dns/lab?name=example.com` returns the record table, propagation matrix, SOA serial comparison, parent/child NS names, and a DNSSEC presence check. `cryptoValidation` is always false: a complete chain is not a validated signature.
+
+```bash
+curl "http://127.0.0.1:8080/api/dns?name=example.com&type=A"
+curl -H "Accept: application/json" "http://127.0.0.1:8080/api/dns?name=example.com&type=MX&dnssec=1&rd=1"
+```
+
+</details>
+
 [![Who-Dat API Docs](https://img.shields.io/badge/API-Docs-85EA2D?style=for-the-badge&logo=openapiinitiative&labelColor=1b2744&link=https%3A%2F%2Fwho-dat.as93.net%2Fdocs)](https://who-dat.as93.net/docs)
 
 
@@ -234,6 +259,15 @@ Set these on Vercel (Project → Settings → Environment Variables). Do not com
 | `CONTACT_RATE_PER_MINUTE` | no | Per-IP budget for the contact form. Default `5`. `0` disables it. |
 | `CONTACT_RATE_BURST` | no | Burst allowance. Default `3`. |
 
+### DNS
+
+`/dns` and `/api/dns` dial public resolvers from this process. No extra services are required.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DNS_SERVER` | no | Default recursive resolver. Default `8.8.8.8`. Must be a public address or hostname. |
+| `DNS_TIMEOUT_MS` | no | Per-query budget for `GET /api/dns`. Default `4000`. The laboratory uses a shorter per-probe budget of its own. |
+
 ---
 
 ## Development
@@ -247,6 +281,8 @@ go mod download
 ```
 
 Then run `go run ./cmd/server`
+
+Open http://127.0.0.1:8080/ for WHOIS and http://127.0.0.1:8080/dns for the DNS laboratory. The page calls this server; it does not use a third-party location API. `DNS_SERVER` and `DNS_TIMEOUT_MS` are optional.
 
 Alternativley, build the Docker container with `docker build -t who-dat .`
 

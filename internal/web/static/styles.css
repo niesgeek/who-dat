@@ -1587,6 +1587,59 @@ html[data-theme="dark"] .card-snap {
 }
 html[data-theme="dark"] .card-snap .empty { border-color: rgba(20, 18, 16, 0.28); }
 
+/* ---------- DNS laboratory ---------- */
+.nav a[aria-current="page"] {
+  background: var(--lime);
+  color: #141210;
+  border-color: var(--ink);
+}
+.page-dns .card-hero { grid-column: span 8; }
+.page-dns .card-me { grid-column: span 4; background: var(--sky-soft); }
+.page-dns .card-span { grid-column: span 12; }
+.page-dns .card-half { grid-column: span 6; }
+.page-dns .chip[aria-pressed="true"] {
+  background: var(--lime);
+  color: #141210;
+}
+.page-dns #typeChips { margin-top: 2px; }
+.page-dns .raw { margin: 0; white-space: pre-wrap; word-break: break-all; }
+.dns-level { font-weight: 700; }
+.dns-links, .dns-names { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.dns-links li, .dns-ns-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: var(--bd-sm) solid var(--ink);
+  border-radius: 12px;
+  background: var(--card);
+}
+.dns-links li.dns-present { background: var(--lime-soft); }
+.dns-links li.dns-absent { background: var(--paper-2); }
+.dns-links li.dns-unknown, .dns-links li.dns-assumed { background: var(--sky-soft); }
+.dns-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border: var(--bd-sm) solid var(--ink);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--paper-2);
+}
+.dns-tag.dns-match, .dns-tag.dns-reference, .dns-tag.dns-baseline, .dns-tag.dns-partial { background: var(--lime); color: #141210; }
+.dns-tag.dns-spread, .dns-tag.dns-no-baseline { background: var(--amber); color: #141210; }
+.dns-tag.dns-empty, .dns-tag.dns-fail, .dns-tag.dns-down { background: var(--coral); color: #141210; }
+.dns-ns { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
+.dns-split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.dns-split h3 { font-size: 13px; margin-bottom: 6px; }
+@media (max-width: 980px) {
+  .page-dns .card-hero,
+  .page-dns .card-me,
+  .page-dns .card-half { grid-column: span 12; }
+  .dns-split { grid-template-columns: 1fr; }
+}
+
 @media (hover: hover) {
   html[data-theme="dark"] .card-snap:hover { box-shadow: 8px 8px 0 #f4efe6; }
   html[data-theme="dark"] .btn:not(.btn-ghost):hover:not(:disabled) {
