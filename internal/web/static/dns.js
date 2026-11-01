@@ -35,7 +35,44 @@
       "me.pop": "节点",
       "me.none": "这台主机没有附上地区信息。",
       "me.fail": "没有读到连接信息。查询本身不受影响。",
+      "me.copy": "复制这条连接",
+      "jump.lookup": "查询",
+      "jump.trace": "链路",
+      "jump.records": "记录",
+      "jump.prop": "传播",
+      "jump.ns": "服务器",
+      "jump.dev": "终端",
+      "jump.faq": "常见问题",
+      "path.title": "解析链路",
+      "path.wait": "等待查询",
+      "path.foot": "从左往右是一次解析要经过的五段。你的查询交给递归解析器，解析器从根问到 TLD，再问到权威服务器。亮起的一段旁边写着这一跳的事实：解析器是否一致、权威有没有 AA 和序列号、上级有没有 DS。没亮的那一段，先看那里。",
+      "path.you": "你的查询",
+      "path.resolver": "递归解析器",
+      "path.auth": "权威 NS",
+      "path.tld": "TLD",
+      "path.root": "根服务器",
+      "path.you.wait": "待查询",
+      "path.you.miss": "未读到",
+      "path.idle": "输入名字后逐段点亮",
+      "path.res.count": "{n} 个解析器已回话",
+      "path.res.none": "没有可比对的答案",
+      "path.res.exact": "{e} / {n} 完全一致",
+      "path.res.fail": "{n} 个无响应",
+      "path.auth.wait": "未知",
+      "path.auth.none": "没拿到名称服务器",
+      "path.auth.down": "权威没有答上 SOA",
+      "path.auth.no": "没拿到区里的答案",
+      "path.auth.aa": "AA=1 · serial {s}",
+      "path.tld.wait": "未知",
+      "path.tld.ds": "已发布 DS（{n} 条）",
+      "path.tld.off": "未启用 DNSSEC",
+      "path.tld.key": "无 DS 委托，区里有 DNSKEY",
+      "path.tld.skip": "这次没检查",
+      "path.root.name": ".（13 组任播）",
+      "path.root.detail": "根区已签名，锚点在解析器里",
       "rec.title": "记录",
+      "rec.copy": "复制",
+      "rec.zone": "导出 zone",
       "rec.empty": "还没有记录",
       "rec.empty2": "查询之后，这里按类型、名字、值和 TTL 列出。",
       "rec.none": "这个类型没有记录。",
@@ -57,8 +94,36 @@
       "how.hijack.a": "看 DS、DNSKEY、RRSIG 是否都在，以及验证型解析器有没有置 AD。记录都在不等于签名有效。",
       "how.ns.q": "正在换名称服务器",
       "how.ns.a": "看每台权威的 SOA 序列号是否一致，再看父区委托和子区自报的 NS 是不是同一组。",
-      "api.title": "命令行",
-      "api.lede": "curl 的 User-Agent 得到 dig 风格的文本。浏览器和 Accept: application/json 得到 JSON。format=json 或 format=text 可以强制。",
+      "priv.title": "数据与隐私",
+      "priv.src.k": "记录从哪来",
+      "priv.src.v": "这台服务器问公共递归器，再问权威服务器",
+      "priv.db.k": "会不会入库",
+      "priv.db.v": "不建查询库。响应带 Cache-Control: no-store",
+      "priv.acct.k": "要不要注册",
+      "priv.acct.v": "不用。页面没有广告，也没有第三方追踪脚本",
+      "priv.name.k": "域名发出去了吗",
+      "priv.name.v": "会，作为 DNS 问题本身。不另做一份档案",
+      "api.title": "终端里直接用",
+      "api.copy": "复制命令",
+      "api.lede": "curl 和 wget 拿到 dig 风格的文本。浏览器，或者带 Accept: application/json，拿到 JSON。format=text 和 format=json 可以强制。server 只能是公网地址。",
+      "api.params": "参数：name（必填）、type、server（公网地址，缺省 8.8.8.8）、dnssec=0/1、rd=0/1、timeout=毫秒。应答被截断时自动改走 TCP。",
+      "api.c1": "# 查记录（默认解析器）",
+      "api.c2": "# 向权威要区里的数据（rd=0，带上 DNSSEC）",
+      "api.c3": "# 向一台递归器要它缓存里的答案（必须 rd=1）",
+      "api.c4": "# JSON（浏览器拿到的就是这个）",
+      "faq.title": "常见问题",
+      "faq.q1": "怎么查一个名字？",
+      "faq.a1": "输入 example.com，或 _dmarc.example.com 这种带下划线的名字。类型可选 A、AAAA、CNAME、MX、TXT、NS、SOA、CAA、SRV、PTR。ALL 会把常见类型列在一张表里，链路和传播按有答案的那个类型展开。",
+      "faq.q2": "刚改的记录还是旧的，是这里坏了吗？",
+      "faq.a2": "先看传播表里权威那一行。它已经是新值，就是递归器还拿着缓存，等 TTL。它还是旧值，区数据本身还没换。问递归器用 rd=1，问权威用 rd=0。问反了会得到 SERVFAIL，那不是故障。",
+      "faq.q3": "序列号为什么要一致？",
+      "faq.a3": "同一套权威靠序列号判断是不是同一版数据。一台落后，不同解析器就可能拿到不同答案。如果 SOA 的主服务器不是同一台，两套序列号各自计数，那是迁移中的两套权威，不一定是同步坏了。",
+      "faq.q4": "链上的记录都在，就等于签名有效吗？",
+      "faq.a4": "不等于。这里看 DS、DNSKEY、RRSIG 在不在，以及验证型解析器有没有置 AD。不做密码学校验。要判断签名本身，用本机的 dig +dnssec 或带校验的解析器。",
+      "faq.q5": "耗时为什么和我本机的 dig 不一样？",
+      "faq.a5": "数字从这台服务器量到解析器，经常含一次 TCP 握手。拿来横向比较谁先拿到新答案，不代表你家网络的延迟。",
+      "faq.q6": "能从 IP 反查名字吗？",
+      "faq.a6": "能。输入 1.1.1.1 或 2001:db8::1，会转成 in-addr.arpa 或 ip6.arpa 并查 PTR。手写反查名也可以。",
       "foot.blurb": "WHOIS 与 DNS",
       "col.type": "类型",
       "col.name": "名字",
@@ -137,6 +202,43 @@
       "me.pop": "Site",
       "me.none": "This host did not attach a place.",
       "me.fail": "No connection details. The lookup still works.",
+      "me.copy": "Copy this connection",
+      "jump.lookup": "Lookup",
+      "jump.trace": "Path",
+      "jump.records": "Records",
+      "jump.prop": "Spread",
+      "jump.ns": "Servers",
+      "jump.dev": "Terminal",
+      "jump.faq": "FAQ",
+      "path.title": "Resolution path",
+      "path.wait": "Waiting",
+      "path.foot": "Left to right is the path a lookup takes. Your question goes to a recursive resolver, which asks the root, then the TLD, then the authoritative server. A lit step shows the fact from that hop: whether resolvers agree, whether authority set AA and a serial, and whether the parent published a DS. The step that stays dim is the one to read first.",
+      "path.you": "Your query",
+      "path.resolver": "Recursive resolver",
+      "path.auth": "Authoritative NS",
+      "path.tld": "TLD",
+      "path.root": "Root servers",
+      "path.you.wait": "Waiting",
+      "path.you.miss": "No address",
+      "path.idle": "Each step lights after a lookup",
+      "path.res.count": "{n} resolvers replied",
+      "path.res.none": "Nothing to compare",
+      "path.res.exact": "{e} / {n} agree exactly",
+      "path.res.fail": "{n} did not reply",
+      "path.auth.wait": "Unknown",
+      "path.auth.none": "No nameservers",
+      "path.auth.down": "Authoritative SOA did not answer",
+      "path.auth.no": "No answer from the zone",
+      "path.auth.aa": "AA=1 · serial {s}",
+      "path.tld.wait": "Unknown",
+      "path.tld.ds": "DS published ({n})",
+      "path.tld.off": "DNSSEC is not enabled",
+      "path.tld.key": "No DS, but the zone has a DNSKEY",
+      "path.tld.skip": "Not checked this time",
+      "path.root.name": ". (13 anycast groups)",
+      "path.root.detail": "The root is signed. Resolvers ship the trust anchor",
+      "rec.copy": "Copy",
+      "rec.zone": "Export zone",
       "rec.title": "Records",
       "rec.empty": "No records yet",
       "rec.empty2": "After a lookup, type, name, value, and TTL land here.",
@@ -159,8 +261,36 @@
       "how.hijack.a": "See whether DS, DNSKEY, and RRSIG are all present, and whether a validating resolver set AD. Presence is not a signature check.",
       "how.ns.q": "Moving nameservers",
       "how.ns.a": "Compare SOA serials on each authoritative server, then compare parent-delegation NS names with the child zone's own NS names.",
-      "api.title": "curl",
-      "api.lede": "A curl User-Agent gets dig-style text. Browsers and Accept: application/json get JSON. format=json or format=text forces one.",
+      "priv.title": "Data and privacy",
+      "priv.src.k": "Where records come from",
+      "priv.src.v": "This server asks public resolvers, then authoritative servers",
+      "priv.db.k": "Stored?",
+      "priv.db.v": "No query database. Responses send Cache-Control: no-store",
+      "priv.acct.k": "Account?",
+      "priv.acct.v": "No. No ads and no third-party tracking scripts",
+      "priv.name.k": "Does the name leave?",
+      "priv.name.v": "Yes, as the DNS question itself. Nothing else is filed",
+      "api.title": "From the terminal",
+      "api.copy": "Copy command",
+      "api.lede": "curl and wget get dig-style text. Browsers, or Accept: application/json, get JSON. format=text and format=json force one. server must be a public address.",
+      "api.params": "Parameters: name (required), type, server (public address, default 8.8.8.8), dnssec=0/1, rd=0/1, timeout in milliseconds. A truncated answer is retried over TCP.",
+      "api.c1": "# records (default resolver)",
+      "api.c2": "# ask authority for the zone (rd=0, with DNSSEC)",
+      "api.c3": "# ask one resolver for its cache (rd=1 required)",
+      "api.c4": "# JSON (what a browser receives)",
+      "faq.title": "Questions",
+      "faq.q1": "How do I look up a name?",
+      "faq.a1": "Type example.com, or an underscore name such as _dmarc.example.com. Types are A, AAAA, CNAME, MX, TXT, NS, SOA, CAA, SRV, and PTR. ALL lists the common types; the path and the matrix follow the first type that has an answer.",
+      "faq.q2": "I just changed a record and still see the old one. Is this page wrong?",
+      "faq.a2": "Read the authoritative row in the matrix. If that row is already new, a resolver is still serving cache until the TTL. If that row is still old, the zone itself has not changed. Resolvers are asked with rd=1. Authority is asked with rd=0. Reversing those gets SERVFAIL, which is not a failure of the zone.",
+      "faq.q3": "Why should the serials match?",
+      "faq.a3": "Servers for one zone use the serial to tell whether they have the same edition. One behind means resolvers can disagree. If the SOA primary names differ, each set counts its own serial. That is two authorities during a move, not automatically a broken transfer.",
+      "faq.q4": "If the records are all present, is the signature valid?",
+      "faq.a4": "No. This check looks for DS, DNSKEY, and RRSIG, and for whether a validating resolver set AD. It does not check the cryptography. For the signature itself, use dig +dnssec or a validating resolver on your machine.",
+      "faq.q5": "Why is the time different from dig on my machine?",
+      "faq.a5": "The number is measured from this server to the resolver and often includes a TCP handshake. Use it to compare who already has the new answer, not as your network's latency.",
+      "faq.q6": "Can I look up an IP?",
+      "faq.a6": "Yes. 1.1.1.1 or 2001:db8::1 is turned into in-addr.arpa or ip6.arpa and queried as PTR. A handwritten reverse name works too.",
       "foot.blurb": "WHOIS and DNS",
       "col.type": "Type",
       "col.name": "Name",
@@ -211,7 +341,7 @@
     }
   };
 
-  var state = { lang: "zh", type: "ALL", busy: false, last: "" };
+  var state = { lang: "zh", type: "ALL", busy: false, last: "", report: null, me: null };
 
   function $(id) { return document.getElementById(id); }
   function t(key) {
@@ -234,6 +364,12 @@
     var toggle = $("langToggle");
     if (toggle) toggle.setAttribute("aria-label", t("lang.aria"));
     buildChips();
+    if (state.report) render(state.report);
+    else {
+      renderPathIdle();
+      renderTerm(null);
+    }
+    if (state.me) renderMe(state.me);
   }
 
   function buildChips() {
@@ -261,7 +397,7 @@
   function loadMe() {
     fetch("/api/whoami", { headers: { Accept: "application/json" } })
       .then(function (r) { return r.json(); })
-      .then(renderMe)
+      .then(function (me) { state.me = me; renderMe(me); })
       .catch(function () {
         $("meKv").innerHTML = "<p class=\"fine\">" + esc(t("me.fail")) + "</p>";
       });
@@ -326,15 +462,174 @@
       });
   }
 
+  function softDots(s) {
+    return esc(s).replace(/\./g, ".\u200b");
+  }
+
+  function fill(s, map) {
+    return String(s).replace(/\{(\w+)\}/g, function (_, k) {
+      return map[k] == null ? "" : String(map[k]);
+    });
+  }
+
   function render(rep) {
+    state.report = rep;
+    renderPath(rep);
     renderRecords(rep);
     renderProp(rep);
     renderSec(rep);
     renderNS(rep);
     renderDel(rep);
-    var shown = rep.primary || "A";
-    var qname = rep.display || rep.name || "example.com";
-    $("curlBox").textContent = "curl \"" + location.origin + "/api/dns?name=" + encodeURIComponent(rep.name || qname) + "&type=" + encodeURIComponent(shown) + "\"";
+    renderTerm(rep);
+    var hasRows = rep && rep.records && rep.records.length;
+    $("copyRec").disabled = !hasRows;
+    $("expZone").disabled = !hasRows;
+  }
+
+  function renderPathIdle() {
+    var keys = [
+      ["you", "path.you"],
+      ["resolver", "path.resolver"],
+      ["authority", "path.auth"],
+      ["tld", "path.tld"],
+      ["root", "path.root"]
+    ];
+    var html = "";
+    keys.forEach(function (pair, i) {
+      html += '<div class="chain-node is-unknown"><div class="chain-k"><span class="chain-dot"></span>' + esc(t(pair[1])) + '</div><div class="chain-name">' + esc(t("path.you.wait")) + '</div><div class="chain-detail">' + esc(t("path.idle")) + "</div></div>";
+      if (i < keys.length - 1) html += '<span class="chain-arrow" aria-hidden="true">→</span>';
+    });
+    $("chainFlow").innerHTML = html;
+    badge("pathBadge", t("path.wait"), "badge-grey");
+  }
+
+  function renderPath(rep) {
+    var nodes = (rep.path && rep.path.nodes) || [];
+    if (!nodes.length) {
+      renderPathIdle();
+      return;
+    }
+    var html = "";
+    nodes.forEach(function (node, i) {
+      var view = pathView(node);
+      html += '<div class="chain-node is-' + esc(node.state || "unknown") + '"><div class="chain-k"><span class="chain-dot"></span>' + esc(view.label) + '</div><div class="chain-name">' + softDots(view.name) + '</div><div class="chain-detail">' + esc(view.detail) + "</div></div>";
+      if (i < nodes.length - 1) html += '<span class="chain-arrow" aria-hidden="true">→</span>';
+    });
+    $("chainFlow").innerHTML = html;
+    var level = (rep.path && rep.path.badge) || "";
+    badge("pathBadge", t("level." + level) || level || t("path.wait"), level === "complete" ? "badge-lime" : "badge-grey");
+  }
+
+  function pathView(node) {
+    var key = node.key;
+    if (key === "you") {
+      return { label: t("path.you"), name: node.name || t("path.you.miss"), detail: node.detail || "" };
+    }
+    if (key === "resolver") {
+      var detail = node.total ? fill(t("path.res.exact"), { e: node.exact || 0, n: node.total }) : t("path.res.none");
+      if (node.failed) detail += " · " + fill(t("path.res.fail"), { n: node.failed });
+      return {
+        label: t("path.resolver"),
+        name: node.total ? fill(t("path.res.count"), { n: node.total }) : t("path.res.none"),
+        detail: detail
+      };
+    }
+    if (key === "authority") {
+      var adetail = t("path.auth.none");
+      if (node.code === "aa") adetail = fill(t("path.auth.aa"), { s: node.serial });
+      else if (node.code === "unreachable") adetail = t("path.auth.down") + (node.detail ? " · " + node.detail : "");
+      else if (node.code === "no-answer") adetail = t("path.auth.no");
+      return { label: t("path.auth"), name: node.name || t("path.auth.wait"), detail: adetail };
+    }
+    if (key === "tld") {
+      var td = t("path.tld.skip");
+      if (node.code === "ds") td = fill(t("path.tld.ds"), { n: node.ds || 0 });
+      else if (node.code === "unsigned") td = t("path.tld.off");
+      else if (node.code === "dnskey-only") td = t("path.tld.key");
+      return { label: t("path.tld"), name: node.name || t("path.tld.wait"), detail: td };
+    }
+    return { label: t("path.root"), name: t("path.root.name"), detail: t("path.root.detail") };
+  }
+
+  function renderTerm(rep) {
+    var text = cmdText(rep);
+    var box = $("cmdBlock");
+    if (box) box.textContent = text;
+    state.cmd = text;
+  }
+
+  function cmdText(rep) {
+    var origin = location.origin;
+    var name = (rep && (rep.name || rep.display)) || "example.com";
+    var type = (rep && rep.primary) || "A";
+    if (type === "ALL") type = "A";
+    var auth = "8.8.8.8";
+    var servers = (rep && rep.nameservers && rep.nameservers.servers) || [];
+    for (var i = 0; i < servers.length; i++) {
+      if (servers[i].ip || servers[i].host) {
+        auth = servers[i].ip || servers[i].host;
+        break;
+      }
+    }
+    var q = function (extra) {
+      return origin + "/api/dns?name=" + encodeURIComponent(name) + extra;
+    };
+    return [
+      t("api.c1"),
+      "curl '" + q("&type=" + encodeURIComponent(type)) + "'",
+      "",
+      t("api.c2"),
+      "curl '" + q("&type=SOA&server=" + encodeURIComponent(auth) + "&rd=0&dnssec=1") + "'",
+      "",
+      t("api.c3"),
+      "curl '" + q("&type=" + encodeURIComponent(type) + "&server=1.1.1.1&rd=1") + "'",
+      "",
+      t("api.c4"),
+      "curl -H 'Accept: application/json' '" + q("&type=" + encodeURIComponent(type)) + "'"
+    ].join("\n");
+  }
+
+  function copyText(text) {
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(function () { legacyCopy(text); });
+      return;
+    }
+    legacyCopy(text);
+  }
+
+  function legacyCopy(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(area);
+  }
+
+  function zoneText(rep) {
+    var rows = (rep && rep.records) || [];
+    var name = (rep && rep.name) || "zone";
+    var stamp = new Date().toISOString().slice(0, 16).replace("T", " ");
+    var head = "; " + name + " — wi.fs.kg (" + stamp + " UTC)\n; Snapshot of this lookup. Check it before pasting into a zone file.\n\n";
+    var body = rows.map(function (r) {
+      var v = String(r.data == null ? "" : r.data);
+      if (r.type === "TXT") v = '"' + v.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
+      return [trimDot(r.name), r.ttl, "IN", r.type, v].join("\t");
+    }).join("\n");
+    return head + body + "\n";
+  }
+
+  function download(filename, text) {
+    var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
   }
 
   function renderRecords(rep) {
@@ -457,8 +752,34 @@
   $("clearBtn").addEventListener("click", function () {
     $("q").value = "";
     state.last = "";
+    state.report = null;
     setStatus(t("status.idle"), "");
     $("propAgain").disabled = true;
+    $("copyRec").disabled = true;
+    $("expZone").disabled = true;
+    renderPathIdle();
+    renderTerm(null);
+  });
+  $("copyCmd").addEventListener("click", function () {
+    copyText(state.cmd || cmdText(state.report));
+  });
+  $("copyRec").addEventListener("click", function () {
+    var rows = (state.report && state.report.records) || [];
+    copyText(rows.map(function (r) { return [r.type, trimDot(r.name), r.ttl, r.data].join("\t"); }).join("\n"));
+  });
+  $("expZone").addEventListener("click", function () {
+    if (!state.report) return;
+    var name = state.report.name || "zone";
+    download(name.replace(/\.$/, "") + ".zone.txt", zoneText(state.report));
+  });
+  $("meCopy").addEventListener("click", function () {
+    var lines = [];
+    document.querySelectorAll("#meKv .kv-row").forEach(function (row) {
+      var k = row.querySelector("dt");
+      var v = row.querySelector("dd");
+      if (k && v) lines.push(k.textContent + ": " + v.textContent);
+    });
+    copyText(lines.join("\n"));
   });
   $("propAgain").addEventListener("click", function () {
     if (state.last) run(state.last);

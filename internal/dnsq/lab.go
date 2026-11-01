@@ -341,7 +341,7 @@ func RunLab(ctx context.Context, qr Querier, in LabInput) (*Report, error) {
 	if records == nil {
 		records = []RR{}
 	}
-	return &Report{
+	report := &Report{
 		OK:        true,
 		Name:      parsed.Name,
 		Display:   parsed.Display,
@@ -363,7 +363,9 @@ func RunLab(ctx context.Context, qr Querier, in LabInput) (*Report, error) {
 			Apex: apex, Servers: servers, SOA: shownSOA, Serials: serials, Delegation: deleg,
 		},
 		Disclaimer: PresenceDisclaimer,
-	}, nil
+	}
+	report.Path = BuildPath(in.Client, report.Propagation, report.DNSSEC, report.Nameservers)
+	return report, nil
 }
 
 type hostIP struct {

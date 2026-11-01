@@ -1603,6 +1603,65 @@ html[data-theme="dark"] .card-snap .empty { border-color: rgba(20, 18, 16, 0.28)
 }
 .page-dns #typeChips { margin-top: 2px; }
 .page-dns .raw { margin: 0; white-space: pre-wrap; word-break: break-all; }
+.dns-jump {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dns-jump a {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 4px 10px;
+  border: var(--bd-sm) solid var(--ink);
+  border-radius: 999px;
+  background: var(--card);
+}
+.chain {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.chain-node {
+  flex: 1 0 148px;
+  min-width: 148px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: var(--bd-sm) solid var(--ink);
+  border-radius: 16px;
+  background: var(--paper-2);
+}
+.chain-node.is-ok { background: var(--lime); color: #141210; }
+.chain-node.is-bad { background: var(--coral); color: #141210; }
+.chain-k {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.chain-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  background: transparent;
+  flex: none;
+}
+.chain-node.is-ok .chain-dot,
+.chain-node.is-bad .chain-dot { background: currentColor; }
+.chain-name { font-weight: 700; font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+.chain-detail { font-size: 12px; line-height: 1.4; }
+.chain-arrow { align-self: center; font-weight: 700; flex: none; }
+.page-dns .term { margin-top: 2px; }
+.page-dns #cmdBlock { white-space: pre-wrap; word-break: break-word; }
 .dns-level { font-weight: 700; }
 .dns-links, .dns-names { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .dns-links li, .dns-ns-item {

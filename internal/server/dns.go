@@ -70,6 +70,7 @@ func (s *server) handleDNSLab(w http.ResponseWriter, r *http.Request) {
 		Type:    r.URL.Query().Get("type"),
 		Server:  serverName,
 		Timeout: 2 * time.Second,
+		Client:  clientHint(r),
 	})
 	if err != nil {
 		writeDNSError(w, r, err)
@@ -208,9 +209,27 @@ func dnsStatus(err error) (int, string, string) {
 	}
 }
 
+func clientHint(r *http.Request) dnsq.ClientHint {
+	country := headerFirst(r, "X-Vercel-IP-Country", "CF-IPCountry")
+	region := headerFirst(r, "X-Vercel-IP-Country-Region", "CF-Region")
+	city := unescapeHeader(headerFirst(r, "X-Vercel-IP-City", "CF-IPCity"))
+	var place []string
+	for _, part := range []string{country, region, city} {
+		if part != "" {
+			place = append(place, part)
+		}
+	}
+	pop := vercelPop(r.Header.Get("X-Vercel-Id"))
+	if pop == "" {
+		pop = cloudflareColo(r.Header.Get("CF-Ray"))
+	}
+	return dnsq.ClientHint{IP: clientIP(r), Place: strings.Join(place, " · "), Pop: pop}
+}
+
 func (s *server) handleWhoami(w http.ResponseWriter, r *http.Request) {
 	setDNSHeaders(w)
-	ip := clientIP(r)
+	hint := clientHint(r)
+	ip := hint.IP
 	version := ""
 	if parsed := net.ParseIP(ip); parsed != nil {
 		if parsed.To4() != nil {

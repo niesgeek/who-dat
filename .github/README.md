@@ -136,7 +136,7 @@ The same server can ask public DNS resolvers. The web page is `/dns`. WHOIS stay
   - **timeout**: milliseconds, clamped to 200–8000
   - **format**: `json` or `text`. Without it, `curl` and `wget` get dig-style text and browsers get JSON
 - **Notes**: responses send `Cache-Control: no-store`. The server refuses loopback, private, and documentation addresses. UDP answers that are truncated are retried over TCP.
-- **Laboratory**: `GET /api/dns/lab?name=example.com` returns the record table, propagation matrix, SOA serial comparison, parent/child NS names, and a DNSSEC presence check. `cryptoValidation` is always false: a complete chain is not a validated signature.
+- **Laboratory**: `GET /api/dns/lab?name=example.com` returns the record table, a five-step resolution path (client, resolvers, authority, TLD, root), the propagation matrix, SOA serial comparison, parent/child NS names, and a DNSSEC presence check. `cryptoValidation` is always false: a complete chain is not a validated signature. The `/dns` page includes that path and copyable curl examples.
 
 ```bash
 curl "http://127.0.0.1:8080/api/dns?name=example.com&type=A"

@@ -78,6 +78,16 @@
       <noscript>
         <p class="noscript">页面需要 JavaScript。接口本身不需要浏览器：<code class="url">/api/dns?name=example.com&amp;type=A</code></p>
       </noscript>
+      <nav class="dns-jump" aria-label="本页">
+        <a href="#lookup" data-i18n="jump.lookup">查询</a>
+        <a href="#trace" data-i18n="jump.trace">链路</a>
+        <a href="#records" data-i18n="jump.records">记录</a>
+        <a href="#prop" data-i18n="jump.prop">传播</a>
+        <a href="#dnssec">DNSSEC</a>
+        <a href="#ns" data-i18n="jump.ns">服务器</a>
+        <a href="#dev" data-i18n="jump.dev">终端</a>
+        <a href="#faq" data-i18n="jump.faq">常见问题</a>
+      </nav>
 
       <section class="card card-hero" id="lookup">
         <p class="eyebrow"><span class="sq sq-violet" aria-hidden="true"></span><span data-i18n="eyebrow">DNS · 记录 · 传播 · 权威</span></p>
@@ -114,12 +124,26 @@
         </div>
         <p class="fine" data-i18n="me.note">只读这次 HTTP 连接和主机已经附上的头。没有第三方地理查询。</p>
         <dl class="kv" id="meKv"></dl>
+        <button type="button" class="btn btn-sum" id="meCopy" data-i18n="me.copy">复制这条连接</button>
       </aside>
+
+      <section class="card card-span" id="trace">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="path.title">解析链路</span></h2>
+          <span class="badge badge-grey" id="pathBadge" data-i18n="path.wait">等待查询</span>
+        </div>
+        <div class="chain" id="chainFlow"></div>
+        <p class="fine" data-i18n="path.foot">从左往右是一次解析要经过的五段。你的查询交给递归解析器，解析器从根问到 TLD，再问到权威服务器。亮起的一段旁边写着这一跳的事实：解析器是否一致、权威有没有 AA 和序列号、上级有没有 DS。没亮的那一段，先看那里。</p>
+      </section>
 
       <section class="card card-span" id="records">
         <div class="card-head">
           <h2 class="h2"><span data-i18n="rec.title">记录</span></h2>
-          <span class="badge badge-grey" id="recBadge">—</span>
+          <div class="card-tools">
+            <button type="button" class="mini" id="copyRec" data-i18n="rec.copy" disabled>复制</button>
+            <button type="button" class="mini" id="expZone" data-i18n="rec.zone" disabled>导出 zone</button>
+            <span class="badge badge-grey" id="recBadge">—</span>
+          </div>
         </div>
         <div id="recBody">
           <div class="empty"><strong data-i18n="rec.empty">还没有记录</strong><p data-i18n="rec.empty2">查询之后，这里按类型、名字、值和 TTL 列出。</p></div>
@@ -188,13 +212,62 @@
         </details>
       </section>
 
-      <section class="card card-half" id="api">
+      <section class="card card-half" id="privacy">
         <div class="card-head">
-          <h2 class="h2"><span data-i18n="api.title">命令行</span></h2>
+          <h2 class="h2"><span data-i18n="priv.title">数据与隐私</span></h2>
         </div>
-        <p class="lede lede-sm" data-i18n="api.lede">curl 的 User-Agent 得到 dig 风格的文本。浏览器和 Accept: application/json 得到 JSON。format=json 或 format=text 可以强制。</p>
-        <pre class="raw" id="curlBox">curl "/api/dns?name=example.com&amp;type=A"</pre>
-        <p class="fine">/api/dns?name=&amp;type=&amp;server=&amp;dnssec=&amp;rd=&amp;timeout=</p>
+        <dl class="kv">
+          <div class="kv-row"><dt data-i18n="priv.src.k">记录从哪来</dt><dd data-i18n="priv.src.v">这台服务器问公共递归器，再问权威服务器</dd></div>
+          <div class="kv-row"><dt data-i18n="priv.db.k">会不会入库</dt><dd data-i18n="priv.db.v">不建查询库。响应带 Cache-Control: no-store</dd></div>
+          <div class="kv-row"><dt data-i18n="priv.acct.k">要不要注册</dt><dd data-i18n="priv.acct.v">不用。页面没有广告，也没有第三方追踪脚本</dd></div>
+          <div class="kv-row"><dt data-i18n="priv.name.k">域名发出去了吗</dt><dd data-i18n="priv.name.v">会，作为 DNS 问题本身。不另做一份档案</dd></div>
+        </dl>
+      </section>
+
+      <section class="card card-span" id="dev">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="api.title">终端里直接用</span></h2>
+          <button type="button" class="mini" id="copyCmd" data-i18n="api.copy">复制命令</button>
+        </div>
+        <p class="lede lede-sm" data-i18n="api.lede">curl 和 wget 拿到 dig 风格的文本。浏览器，或者带 Accept: application/json，拿到 JSON。format=text 和 format=json 可以强制。server 只能是公网地址。</p>
+        <div class="term">
+          <div class="term-bar">
+            <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+            <span class="term-title">curl</span>
+          </div>
+          <pre class="term-body" id="cmdBlock"></pre>
+        </div>
+        <p class="fine" data-i18n="api.params">参数：name（必填）、type、server（公网地址，缺省 8.8.8.8）、dnssec=0/1、rd=0/1、timeout=毫秒。应答被截断时自动改走 TCP。</p>
+      </section>
+
+      <section class="card card-span" id="faq">
+        <div class="card-head">
+          <h2 class="h2"><span data-i18n="faq.title">常见问题</span></h2>
+        </div>
+        <details class="qa">
+          <summary data-i18n="faq.q1">怎么查一个名字？</summary>
+          <p data-i18n="faq.a1">输入 example.com，或 _dmarc.example.com 这种带下划线的名字。类型可选 A、AAAA、CNAME、MX、TXT、NS、SOA、CAA、SRV、PTR。ALL 会把常见类型列在一张表里，链路和传播按有答案的那个类型展开。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="faq.q2">刚改的记录还是旧的，是这里坏了吗？</summary>
+          <p data-i18n="faq.a2">先看传播表里权威那一行。它已经是新值，就是递归器还拿着缓存，等 TTL。它还是旧值，区数据本身还没换。问递归器用 rd=1，问权威用 rd=0。问反了会得到 SERVFAIL，那不是故障。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="faq.q3">序列号为什么要一致？</summary>
+          <p data-i18n="faq.a3">同一套权威靠序列号判断是不是同一版数据。一台落后，不同解析器就可能拿到不同答案。如果 SOA 的主服务器不是同一台，两套序列号各自计数，那是迁移中的两套权威，不一定是同步坏了。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="faq.q4">链上的记录都在，就等于签名有效吗？</summary>
+          <p data-i18n="faq.a4">不等于。这里看 DS、DNSKEY、RRSIG 在不在，以及验证型解析器有没有置 AD。不做密码学校验。要判断签名本身，用本机的 dig +dnssec 或带校验的解析器。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="faq.q5">耗时为什么和我本机的 dig 不一样？</summary>
+          <p data-i18n="faq.a5">数字从这台服务器量到解析器，经常含一次 TCP 握手。拿来横向比较谁先拿到新答案，不代表你家网络的延迟。</p>
+        </details>
+        <details class="qa">
+          <summary data-i18n="faq.q6">能从 IP 反查名字吗？</summary>
+          <p data-i18n="faq.a6">能。输入 1.1.1.1 或 2001:db8::1，会转成 in-addr.arpa 或 ip6.arpa 并查 PTR。手写反查名也可以。</p>
+        </details>
       </section>
     </main>
 

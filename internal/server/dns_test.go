@@ -115,7 +115,7 @@ func TestDNSPageAndLabAndWhoami(t *testing.T) {
 		t.Fatalf("dns page = %d %s", page.Code, page.Header().Get("Content-Type"))
 	}
 	body := page.Body.String()
-	for _, want := range []string{"/api/dns", "example.com", "WHOIS", "/contact", "not a validated signature"} {
+	for _, want := range []string{"/api/dns", "example.com", "WHOIS", "/contact", "not a validated signature", `id="trace"`, `id="cmdBlock"`, "解析链路"} {
 		if !strings.Contains(body, want) {
 			t.Errorf("dns page missing %q", want)
 		}
@@ -128,7 +128,10 @@ func TestDNSPageAndLabAndWhoami(t *testing.T) {
 	}
 
 	lab := httptest.NewRecorder()
-	h.ServeHTTP(lab, httptest.NewRequest(http.MethodGet, "/api/dns/lab?name=example.com&type=A", nil))
+	labReq := httptest.NewRequest(http.MethodGet, "/api/dns/lab?name=example.com&type=A", nil)
+	labReq.Header.Set("X-Forwarded-For", "203.0.113.9")
+	labReq.Header.Set("X-Vercel-IP-Country", "US")
+	h.ServeHTTP(lab, labReq)
 	if lab.Code != http.StatusOK {
 		t.Fatalf("lab = %d %s", lab.Code, lab.Body)
 	}
@@ -138,6 +141,9 @@ func TestDNSPageAndLabAndWhoami(t *testing.T) {
 	}
 	if !report.OK || report.DNSSEC.CryptoValidation || !strings.Contains(report.Disclaimer, "not a validated signature") {
 		t.Fatalf("lab report = %+v", report.DNSSEC)
+	}
+	if len(report.Path.Nodes) != 5 || report.Path.Nodes[0].Key != "you" || report.Path.Nodes[0].Name != "203.0.113.9" || report.Path.Nodes[4].Key != "root" {
+		t.Fatalf("path = %+v", report.Path)
 	}
 
 	who := httptest.NewRecorder()
