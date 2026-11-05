@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -210,62 +209,13 @@ func dnsStatus(err error) (int, string, string) {
 }
 
 func clientHint(r *http.Request) dnsq.ClientHint {
-	country := headerFirst(r, "X-Vercel-IP-Country", "CF-IPCountry")
-	region := headerFirst(r, "X-Vercel-IP-Country-Region", "CF-Region")
-	city := unescapeHeader(headerFirst(r, "X-Vercel-IP-City", "CF-IPCity"))
-	var place []string
-	for _, part := range []string{country, region, city} {
-		if part != "" {
-			place = append(place, part)
-		}
-	}
-	pop := vercelPop(r.Header.Get("X-Vercel-Id"))
-	if pop == "" {
-		pop = cloudflareColo(r.Header.Get("CF-Ray"))
-	}
-	return dnsq.ClientHint{IP: clientIP(r), Place: strings.Join(place, " · "), Pop: pop}
+	info := readConnection(r)
+	return dnsq.ClientHint{IP: info.IP, Place: info.placeLine(), Pop: info.Colo}
 }
 
 func (s *server) handleWhoami(w http.ResponseWriter, r *http.Request) {
 	setDNSHeaders(w)
-	hint := clientHint(r)
-	ip := hint.IP
-	version := ""
-	if parsed := net.ParseIP(ip); parsed != nil {
-		if parsed.To4() != nil {
-			version = "IPv4"
-		} else {
-			version = "IPv6"
-		}
-	}
-	country := headerFirst(r, "X-Vercel-IP-Country", "CF-IPCountry")
-	region := headerFirst(r, "X-Vercel-IP-Country-Region", "CF-Region")
-	city := unescapeHeader(headerFirst(r, "X-Vercel-IP-City", "CF-IPCity"))
-	pop := vercelPop(r.Header.Get("X-Vercel-Id"))
-	if pop == "" {
-		pop = cloudflareColo(r.Header.Get("CF-Ray"))
-	}
-	tlsVersion := ""
-	if r.TLS != nil {
-		tlsVersion = tlsName(r.TLS.Version)
-	}
-	proto := r.Proto
-	forwarded := r.Header.Get("X-Forwarded-Proto")
-	hints := country != "" || region != "" || city != "" || pop != ""
-	writeJSON(w, http.StatusOK, map[string]any{
-		"ip":             ip,
-		"version":        version,
-		"country":        country,
-		"region":         region,
-		"city":           city,
-		"protocol":       proto,
-		"tls":            tlsVersion,
-		"forwardedProto": forwarded,
-		"pop":            pop,
-		"platformHints":  hints,
-		"source":         "connection",
-		"thirdPartyGeo":  false,
-	})
+	writeJSON(w, http.StatusOK, readConnection(r).public())
 }
 
 func headerFirst(r *http.Request, keys ...string) string {
@@ -311,13 +261,13 @@ func cloudflareColo(ray string) string {
 func tlsName(v uint16) string {
 	switch v {
 	case 0x0301:
-		return "TLS1.0"
+		return "TLSv1.0"
 	case 0x0302:
-		return "TLS1.1"
+		return "TLSv1.1"
 	case 0x0303:
-		return "TLS1.2"
+		return "TLSv1.2"
 	case 0x0304:
-		return "TLS1.3"
+		return "TLSv1.3"
 	default:
 		if v == 0 {
 			return ""

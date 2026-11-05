@@ -119,12 +119,22 @@
 
       <aside class="card card-me" id="whoami">
         <div class="card-head">
-          <h2 class="h2"><span data-i18n="me.title">这条连接</span></h2>
-          <span class="badge badge-grey" id="meBadge" data-i18n="me.badge">连接</span>
+          <h2 class="h2"><span data-i18n="me.title">你的接入体检</span></h2>
+          <span class="badge badge-grey" id="meBadge" data-i18n="me.badge">读取中</span>
         </div>
-        <p class="fine" data-i18n="me.note">只读这次 HTTP 连接和主机已经附上的头。没有第三方地理查询。</p>
+        <button type="button" class="ipbig" id="meIpBtn">
+          <span class="ipbig-txt" id="meIp">— — —</span>
+          <span class="ipbig-cc" id="meCC"></span>
+        </button>
+        <p class="ipbig-sub" id="meSub" data-i18n="me.loading">正在读这条连接…</p>
         <dl class="kv" id="meKv"></dl>
-        <button type="button" class="btn btn-sum" id="meCopy" data-i18n="me.copy">复制这条连接</button>
+        <p class="fine" id="meLimit" data-i18n="me.limit">ASN、运营商和访问者的 TLS 版本，只有平台写进请求头才会出现。Vercel 目前给国家、城市和接入区域，不给 ASN；TLS 在边缘终结，函数看不到协商版本。本页不查外部库。</p>
+        <button type="button" class="btn btn-sum" id="meCopy" data-i18n="me.copy">复制体检摘要</button>
+        <a class="sister" href="https://ip.fs.kg/">
+          <span class="sister-k" data-i18n="me.sister.k">姊妹站</span>
+          <span class="sister-host">ip.fs.kg</span>
+          <span class="sister-d" data-i18n="me.sister.d">这个 IP 的归属和运营商在那边查。本页不调用它。</span>
+        </a>
       </aside>
 
       <section class="card card-span" id="trace">
@@ -155,7 +165,7 @@
           <h2 class="h2"><span data-i18n="prop.title">传播</span></h2>
           <button type="button" class="mini" id="propAgain" data-i18n="prop.again" disabled>再问一次</button>
         </div>
-        <p class="fine" data-i18n="prop.note">递归解析器用 RD=1。权威服务器用 RD=0。耗时从这台服务器量起，含握手。多地址或分线路时，有交集算部分一致，不算故障。</p>
+        <p class="fine" data-i18n="prop.note">同一张表对照公共递归器（rd=1，缓存里的答案）和权威（rd=0，区里的值，旁边有 SOA 序列号）。权威已是新值、递归还是旧值，就是缓存；权威自己还是旧值，就是区没改。耗时从这台服务器量起，含握手。</p>
         <div id="propBody">
           <div class="empty"><strong data-i18n="prop.empty">等待查询</strong></div>
         </div>

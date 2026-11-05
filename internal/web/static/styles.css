@@ -1595,6 +1595,53 @@ html[data-theme="dark"] .card-snap .empty { border-color: rgba(20, 18, 16, 0.28)
 }
 .page-dns .card-hero { grid-column: span 8; }
 .page-dns .card-me { grid-column: span 4; background: var(--sky-soft); }
+.ipbig {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border: var(--bd) solid var(--ink);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: var(--sh-xs);
+  cursor: pointer;
+}
+.ipbig-txt {
+  font-family: var(--mono);
+  font-size: clamp(15px, 1.6vw, 20px);
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-all;
+}
+.ipbig-cc {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border: var(--bd-sm) solid var(--ink);
+  border-radius: 999px;
+  background: var(--lime);
+  color: #141210;
+}
+.ipbig-cc:empty { display: none; }
+.ipbig-sub { font-size: 12.5px; color: var(--ink-70); }
+.sister {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  text-decoration: none;
+  border: var(--bd-sm) solid var(--ink);
+  border-radius: 14px;
+  background: var(--card);
+}
+.sister-k { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-45); }
+.sister-host { font-weight: 700; }
+.sister-d { font-size: 12px; line-height: 1.45; color: var(--ink-70); }
 .page-dns .card-span { grid-column: span 12; }
 .page-dns .card-half { grid-column: span 6; }
 .page-dns .chip[aria-pressed="true"] {

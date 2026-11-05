@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -115,7 +116,7 @@ func TestDNSPageAndLabAndWhoami(t *testing.T) {
 		t.Fatalf("dns page = %d %s", page.Code, page.Header().Get("Content-Type"))
 	}
 	body := page.Body.String()
-	for _, want := range []string{"/api/dns", "example.com", "WHOIS", "/contact", "not a validated signature", `id="trace"`, `id="cmdBlock"`, "解析链路"} {
+	for _, want := range []string{"/api/dns", "example.com", "WHOIS", "/contact", "not a validated signature", `id="trace"`, `id="cmdBlock"`, "解析链路", "你的接入体检", "https://ip.fs.kg/", `id="meIp"`} {
 		if !strings.Contains(body, want) {
 			t.Errorf("dns page missing %q", want)
 		}
@@ -151,18 +152,53 @@ func TestDNSPageAndLabAndWhoami(t *testing.T) {
 	wreq.Header.Set("X-Forwarded-For", "203.0.113.9, 10.0.0.1")
 	wreq.Header.Set("X-Vercel-IP-Country", "US")
 	wreq.Header.Set("X-Vercel-IP-City", "New%20York")
+	wreq.Header.Set("X-Vercel-IP-Continent", "NA")
 	wreq.Header.Set("X-Vercel-Id", "iad1::sfo1")
+	wreq.Header.Set("X-ASN", "13335")
+	wreq.Header.Set("X-Forwarded-Proto", "https")
 	wreq.RemoteAddr = "10.1.1.1:4000"
 	h.ServeHTTP(who, wreq)
 	var me map[string]any
 	if err := json.Unmarshal(who.Body.Bytes(), &me); err != nil {
 		t.Fatal(err)
 	}
-	if me["ip"] != "203.0.113.9" || me["country"] != "US" || me["city"] != "New York" || me["pop"] != "iad1" || me["thirdPartyGeo"] != false || me["source"] != "connection" {
+	if me["ip"] != "203.0.113.9" || me["country"] != "US" || me["country_code"] != "US" || me["city"] != "New York" || me["pop"] != "iad1" || me["colo"] != "iad1" || me["continent"] != "NA" || me["type"] != "IPv4" || me["thirdPartyGeo"] != false || me["source"] != "connection" || me["edge"] != true {
 		t.Fatalf("whoami = %+v", me)
+	}
+	if me["asn"] != nil || me["org"] != "" || me["tlsVersion"] != "" {
+		t.Fatalf("platform did not send asn/org/tls, got %+v", me)
+	}
+	missing, _ := me["unavailable"].([]any)
+	gotMissing := map[string]bool{}
+	for _, item := range missing {
+		if s, ok := item.(string); ok {
+			gotMissing[s] = true
+		}
+	}
+	for _, want := range []string{"asn", "org", "tlsVersion"} {
+		if !gotMissing[want] {
+			t.Errorf("unavailable missing %q in %+v", want, me["unavailable"])
+		}
 	}
 	if who.Header().Get("Cache-Control") != "no-store" {
 		t.Fatal("whoami cached")
+	}
+}
+
+func TestWhoamiUsesProcessTLSAndIgnoresClientASN(t *testing.T) {
+	h := dnsHandler(&stubDNS{})
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/whoami", nil)
+	req.RemoteAddr = "192.0.2.10:9"
+	req.Header.Set("X-ASN", "1")
+	req.TLS = &tls.ConnectionState{Version: tls.VersionTLS13}
+	h.ServeHTTP(rec, req)
+	var me map[string]any
+	if err := json.Unmarshal(rec.Body.Bytes(), &me); err != nil {
+		t.Fatal(err)
+	}
+	if me["ip"] != "192.0.2.10" || me["tlsVersion"] != "TLSv1.3" || me["httpProtocol"] != "HTTP/1.1" || me["edge"] != false || me["asn"] != nil {
+		t.Fatalf("local whoami = %+v", me)
 	}
 }
 
