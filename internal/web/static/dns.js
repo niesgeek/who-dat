@@ -24,18 +24,27 @@
       "btn.searching": "查询中…",
       "chips.label": "试试",
       "status.idle": "输入 example.com，或点一个类型。",
-      "me.title": "这条连接",
-      "me.badge": "连接",
-      "me.note": "只读这次 HTTP 连接和主机已经附上的头。没有第三方地理查询。",
-      "me.ip": "地址",
-      "me.ver": "版本",
-      "me.place": "地区",
-      "me.proto": "协议",
-      "me.tls": "TLS",
-      "me.pop": "节点",
-      "me.none": "这台主机没有附上地区信息。",
+      "me.title": "你的接入体检",
+      "me.badge": "读取中",
+      "me.edge": "平台直读",
+      "me.localbadge": "本机连接",
+      "me.loading": "正在读这条连接…",
+      "me.note": "只读这次连接和平台已经写上的头。没有第三方地理或 ASN 查询。",
+      "me.place": "国家 / 城市",
+      "me.org": "运营商",
+      "me.asn": "ASN",
+      "me.ver": "协议版本",
+      "me.link": "连接 / TLS",
+      "me.pop": "接入节点",
+      "me.none": "位置未附上",
+      "me.absent": "平台未附上",
+      "me.miss": "未读到",
+      "me.local": "没有平台地理头，地址来自这条连接。",
       "me.fail": "没有读到连接信息。查询本身不受影响。",
-      "me.copy": "复制这条连接",
+      "me.copy": "复制体检摘要",
+      "me.limit": "ASN、运营商和访问者的 TLS 版本，只有平台写进请求头才会出现。Vercel 目前给国家、城市和接入区域，不给 ASN；TLS 在边缘终结，函数看不到协商版本。本页不查外部库。",
+      "me.sister.k": "姊妹站",
+      "me.sister.d": "这个 IP 的归属和运营商在那边查。本页不调用它。",
       "jump.lookup": "查询",
       "jump.trace": "链路",
       "jump.records": "记录",
@@ -78,7 +87,7 @@
       "rec.none": "这个类型没有记录。",
       "prop.title": "传播",
       "prop.again": "再问一次",
-      "prop.note": "递归解析器用 RD=1。权威服务器用 RD=0。耗时从这台服务器量起，含握手。多地址或分线路时，有交集算部分一致，不算故障。",
+      "prop.note": "同一张表对照公共递归器（rd=1，缓存里的答案）和权威（rd=0，区里的值，旁边有 SOA 序列号）。权威已是新值、递归还是旧值，就是缓存；权威自己还是旧值，就是区没改。耗时从这台服务器量起，含握手。",
       "prop.empty": "等待查询",
       "sec.empty": "查询后看记录在不在",
       "ns.title": "权威与 SOA",
@@ -192,17 +201,26 @@
       "chips.label": "Try",
       "status.idle": "Type example.com, or pick a type.",
       "me.title": "This connection",
-      "me.badge": "Link",
-      "me.note": "Read from this HTTP connection and headers the host already set. No third-party location lookup.",
-      "me.ip": "Address",
-      "me.ver": "Version",
-      "me.place": "Place",
-      "me.proto": "Protocol",
-      "me.tls": "TLS",
+      "me.badge": "Reading",
+      "me.edge": "From the platform",
+      "me.localbadge": "This process",
+      "me.loading": "Reading this connection…",
+      "me.note": "Read from this connection and headers the platform already set. No third-party location or ASN lookup.",
+      "me.place": "Country / city",
+      "me.org": "Network",
+      "me.asn": "ASN",
+      "me.ver": "IP version",
+      "me.link": "Connection / TLS",
       "me.pop": "Site",
-      "me.none": "This host did not attach a place.",
+      "me.none": "No place was attached",
+      "me.absent": "Not attached",
+      "me.miss": "Unread",
+      "me.local": "No platform place headers. The address is from this connection.",
       "me.fail": "No connection details. The lookup still works.",
-      "me.copy": "Copy this connection",
+      "me.copy": "Copy summary",
+      "me.limit": "ASN, network name, and the visitor TLS version appear only when the platform puts them on the request. Vercel sends country, city, and the edge region, not an ASN. TLS ends at the edge, so the function does not see the negotiated version. This page does not call an outside database.",
+      "me.sister.k": "Sister site",
+      "me.sister.d": "Place and network for this IP are on that site. This page does not call it.",
       "jump.lookup": "Lookup",
       "jump.trace": "Path",
       "jump.records": "Records",
@@ -245,7 +263,7 @@
       "rec.none": "No records of this type.",
       "prop.title": "Propagation",
       "prop.again": "Ask again",
-      "prop.note": "Resolvers are asked with RD=1. Authoritative servers are asked with RD=0. Time is measured from this server and includes the handshake. Overlapping answers on multi-address names count as partial, not as a failure.",
+      "prop.note": "One table compares public resolvers (rd=1, the cached answer) with authority (rd=0, the zone, with the SOA serial beside it). A new authoritative value and an old resolver value is cache. An old authoritative value means the zone has not changed. Time is measured from this server and includes the handshake.",
       "prop.empty": "Waiting",
       "sec.empty": "Presence shows up after a lookup",
       "ns.title": "Authority and SOA",
@@ -403,21 +421,51 @@
       });
   }
 
+  function regionName(cc) {
+    if (!cc || !window.Intl || !Intl.DisplayNames) return cc || "";
+    try {
+      var names = new Intl.DisplayNames([state.lang === "en" ? "en" : "zh"], { type: "region" });
+      return names.of(cc) || cc;
+    } catch (e) {
+      return cc;
+    }
+  }
+
   function renderMe(me) {
     me = me || {};
-    var place = [me.country, me.region, me.city].filter(Boolean).join(" · ");
+    var ip = me.ip || "";
+    var cc = me.country_code || me.country || "";
+    var placeBits = [regionName(cc), me.region, me.city].filter(Boolean);
+    var seen = {};
+    var place = [];
+    placeBits.forEach(function (bit) {
+      var key = String(bit).toLowerCase();
+      if (seen[key]) return;
+      seen[key] = 1;
+      place.push(bit);
+    });
+    var placeText = place.join(" · ");
+    if ($("meIp")) $("meIp").textContent = ip || t("me.miss");
+    if ($("meCC")) $("meCC").textContent = cc;
+    if ($("meSub")) $("meSub").textContent = placeText || (me.edge ? t("me.none") : t("me.local"));
+    var absent = t("me.absent");
+    var asn = me.asn ? ("AS" + me.asn) : absent;
+    var org = me.org || absent;
+    var tls = me.tlsVersion || me.tls || absent;
+    var httpP = me.httpProtocol || me.protocol || absent;
+    var colo = me.colo || me.pop || absent;
     var rows = [
-      [t("me.ip"), me.ip || "—"],
-      [t("me.ver"), me.version || "—"],
-      [t("me.place"), place || t("me.none")],
-      [t("me.proto"), [me.protocol, me.forwardedProto].filter(Boolean).join(" / ") || "—"],
-      [t("me.tls"), me.tls || "—"],
-      [t("me.pop"), me.pop || "—"]
+      [t("me.place"), placeText || t("me.none")],
+      [t("me.org"), org],
+      [t("me.asn"), asn],
+      [t("me.ver"), me.type || me.version || "—"],
+      [t("me.link"), httpP + " / " + tls],
+      [t("me.pop"), colo]
     ];
     $("meKv").innerHTML = rows.map(function (row) {
       return "<div class=\"kv-row\"><dt>" + esc(row[0]) + "</dt><dd>" + esc(row[1]) + "</dd></div>";
     }).join("");
-    badge("meBadge", me.platformHints ? (me.country || t("me.badge")) : t("me.badge"), me.ip ? "badge-lime" : "badge-grey");
+    badge("meBadge", me.edge || me.platformHints ? t("me.edge") : t("me.localbadge"), me.edge || me.platformHints ? "badge-lime" : "badge-grey");
   }
 
   function currentName() {
@@ -772,14 +820,23 @@
     var name = state.report.name || "zone";
     download(name.replace(/\.$/, "") + ".zone.txt", zoneText(state.report));
   });
-  $("meCopy").addEventListener("click", function () {
+  function meSummary() {
     var lines = [];
+    var ip = $("meIp");
+    if (ip && ip.textContent) lines.push(ip.textContent);
+    var sub = $("meSub");
+    if (sub && sub.textContent) lines.push(sub.textContent);
     document.querySelectorAll("#meKv .kv-row").forEach(function (row) {
       var k = row.querySelector("dt");
       var v = row.querySelector("dd");
       if (k && v) lines.push(k.textContent + ": " + v.textContent);
     });
-    copyText(lines.join("\n"));
+    return lines.join("\n");
+  }
+  $("meCopy").addEventListener("click", function () { copyText(meSummary()); });
+  $("meIpBtn").addEventListener("click", function () {
+    var ip = $("meIp") ? $("meIp").textContent : "";
+    if (ip && ip !== t("me.miss") && ip !== "— — —") copyText(ip);
   });
   $("propAgain").addEventListener("click", function () {
     if (state.last) run(state.last);

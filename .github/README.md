@@ -282,7 +282,9 @@ go mod download
 
 Then run `go run ./cmd/server`
 
-Open http://127.0.0.1:8080/ for WHOIS and http://127.0.0.1:8080/dns for the DNS laboratory. The page calls this server; it does not use a third-party location API. `DNS_SERVER` and `DNS_TIMEOUT_MS` are optional.
+Open http://127.0.0.1:8080/ for WHOIS and http://127.0.0.1:8080/dns for the DNS laboratory. The page calls this server. `DNS_SERVER` and `DNS_TIMEOUT_MS` are optional.
+
+`GET /api/whoami` describes the connection that hit this process: address, IP version, and whatever place and edge region the platform put on the request (`x-vercel-ip-*`, `x-vercel-id`). It does not call a geolocation or ASN database. Vercel does not attach an ASN, an ISP name, or the visitor's TLS version (TLS ends at the edge, so the function usually sees plain HTTP). Those fields stay empty and are listed in `unavailable`. A sister link on `/dns` points at [ip.fs.kg](https://ip.fs.kg/) for a separate IP lookup; this page does not request it.
 
 Alternativley, build the Docker container with `docker build -t who-dat .`
 

@@ -70,6 +70,20 @@ paths:
                   results:
                     type: array
                     items: { $ref: "#/components/schemas/Result" }
+  /api/whoami:
+    get:
+      summary: Connection facts for this request
+      description: >
+        Reads the visitor address and headers the platform already attached
+        (Vercel geolocation and edge region, or the TLS session if this
+        process terminated it). ASN, ISP, and the visitor TLS version are
+        returned empty when the platform did not send them. This route does
+        not call a location or ASN service. `Cache-Control` is `no-store`.
+        `unavailable` lists the fields that stayed empty for that reason.
+      operationId: whoami
+      responses:
+        "200":
+          description: Connection snapshot. asn is null when the platform omitted it.
   /api/dns:
     get:
       summary: Query one DNS name
