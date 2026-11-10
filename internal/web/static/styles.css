@@ -1172,8 +1172,9 @@ html[lang="en"] .kv-2 { grid-template-columns: 1fr; }
   align-items: start;
   margin-top: 32px;
 }
-.contact-intro { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-.contact-notes { gap: 10px; }
+.contact-intro { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.contact-notes { gap: 18px; }
+.contact-notes li { line-height: 1.85; }
 
 .contact-tags { display: flex; flex-direction: column; gap: 9px; }
 .contact-tags-k {
