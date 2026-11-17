@@ -125,6 +125,8 @@
       "about.n2": "两种来源收成同一套字段：是否注册、注册商、日期、状态码、名称服务器、DNSSEC、联系人。",
       "about.n3": "速率看部署方式。放在 Vercel 上时，匿名访问默认大约每分钟 30 次。",
       "about.n4": "这是注册信息，不是「这个站安不安全」的结论。页面不加载广告或统计脚本。",
+      "about.n5": "参考价格是后缀级报价快照，来自哪煮米收录的公开挂牌价；最终以注册商结算页为准。",
+      "about.n6": "少数后缀没有机器可读接口，或名字只在平台内部登记 —— 这两种情况都会明说，不拿空结果冒充「未注册」。",
       "faq.title": "常见问题",
       "faq.q1": "怎么查一个域名的注册信息？",
       "faq.a1": "在上方输入域名，例如 example.com，或点一个示例。也接受带 https:// 的地址，服务端会先剥掉协议和路径。页面请求本站的 /v1/whois/{domain}，把注册状态、注册商、日期、名称服务器和联系人摊开。",
@@ -134,6 +136,16 @@
       "faq.a3": "可以，不需要密钥。请求 <code class=\"path\">/v1/whois/example.com</code> 得到归一化 JSON；加上 <code class=\"path\">?raw=true</code> 则是上游原文。多个域名用 <code class=\"path\">/multi?domains=a.com,b.com</code>。完整地址在上面的终端示例里。浏览器访问根路径仍然是这个页面。",
       "faq.q4": "会记录我查过什么吗？",
       "faq.a4": "页面没有第三方统计。「最近」列表只存在你这台浏览器的本地存储里，可以在上面一键清除。服务端可以开内存缓存，用来少打注册局，缓存的是查询结果，不是一份用户档案。",
+      "faq.q5": "返回「未注册」是不是说明这个域名可以注册？",
+      "faq.a5": "不一定。注册局没有这条公开记录，可能代表未注册，也可能是注册局保留域名、刚被删除还在赎回期，或者该注册局对某些名字不公开。要确认可注册性，得去注册商的实时下单接口。",
+      "faq.q6": "到期时间准吗？能拿来判断会不会掉？",
+      "faq.a6": "准的是「注册局当前登记的到期日」，但它在续费、转移、赎回期都会变。临界 30 天内建议直接看注册商后台的续费状态，别只信这里的数字。上面的倒计时按「注册 → 到期」的比例画出已过去的时长，只做直观参考。",
+      "faq.q7": "状态码里 clientTransferProhibited 是好是坏？",
+      "faq.a7": "通常是好：它意味着注册商侧锁住了转移，别人没法在你不知情时把域名转走。新注册和刚续费的域名普遍带着它。真正要担心的是 clientHold / serverHold —— 那表示解析被暂停了。每个状态码的具体意思见上面的「状态码含义」。",
+      "faq.q8": "支持哪些顶级域？为什么有的后缀查不到？",
+      "faq.a8": "本站走 IANA 的 RDAP 注册表，外加一批实测有 RDAP、但 IANA 没登记的注册局，以及 13 个二级后缀的注册局自营 RDAP 服务；没有 RDAP 的后缀退回端口 43 的 WHOIS。剩下少数后缀连注册局都没开机器可读接口，输入时会明确说「没有接口」，不拿空结果冒充未注册。另外 cc.cd、us.ci 这类平台在自己域名下切出来的三级名，注册局只登记到父域那层，本站会明确说明这条记录只在平台内部、要去平台后台查。",
+      "faq.q9": "参考价格是哪来的？能直接按这个价买吗？",
+      "faq.a9": "价格来自哪煮米收录的注册商公开挂牌价，是最近一次采集入库的快照，不是实时行情；人民币由上游按参考汇率折算。带券的价格还有限用次数或仅限新用户，最终以注册商结算页为准。报价只覆盖后缀级价格，不代表这个具体域名可注册。",
       "foot.blurb": "域名注册信息",
       "foot.privacy": "无广告 · 无追踪",
       "due.title": "到期倒计时",
@@ -153,6 +165,7 @@
       "due.suspended": "解析已暂停",
       "due.active": "解析正常",
       "source.title": "查询来源",
+      "source.fine": "这里写的是这一次查询真实命中的注册局端点、花了多久、走的什么协议 —— 不是一句笼统的「RDAP」。404 或查不到时也会如实写，不留一片空白。",
       "source.badge.wait": "等待查询",
       "source.empty": "查询后这里显示实际命中的注册局端点，以及这一跳花了多久、走的什么协议。",
       "source.endpoint": "命中端点",
@@ -371,6 +384,8 @@
       "about.n2": "Both sources are normalized: registration, registrar, dates, status codes, nameservers, DNSSEC, contacts.",
       "about.n3": "Rate limits depend on the deploy. On Vercel, anonymous traffic defaults to about 30 requests a minute.",
       "about.n4": "This is registration data, not a verdict on whether a site is safe. The page loads no ads and no analytics.",
+      "about.n5": "Reference prices are suffix-level snapshots of public list prices collected by nazhumi.com; the registrar's checkout page is final.",
+      "about.n6": "A few suffixes have no machine-readable interface, and some names are only registered inside a platform — both cases are stated plainly, never passed off as “unregistered”.",
       "faq.title": "FAQ",
       "faq.q1": "How do I look up a domain?",
       "faq.a1": "Type a domain such as example.com, or pick an example. URLs are fine — the server strips the scheme and path. The page calls this site's /v1/whois/{domain} and lays out status, registrar, dates, nameservers, and contacts.",
@@ -380,6 +395,16 @@
       "faq.a3": "Yes, with no key. <code class=\"path\">/v1/whois/example.com</code> returns normalized JSON; <code class=\"path\">?raw=true</code> returns the upstream payload. Several domains: <code class=\"path\">/multi?domains=a.com,b.com</code>. The terminal block above shows the absolute URL for this host. A browser at the root still gets this page.",
       "faq.q4": "Do you store what I look up?",
       "faq.a4": "There is no third-party analytics. The recent list lives only in this browser and can be cleared above. The server may keep an in-memory cache of lookup results so it hits registries less often. That cache is not a user profile.",
+      "faq.q5": "Does “not registered” mean the domain is available?",
+      "faq.a5": "Not necessarily. No public record from the registry can mean unregistered, but it can also be a registry-reserved name, a name just deleted and still in redemption, or a name that registry does not publish. To confirm availability, use a registrar's live checkout.",
+      "faq.q6": "Is the expiry date accurate? Can it tell me whether the name will drop?",
+      "faq.a6": "The expiry date on record is accurate, but it moves on renewal, transfer, and redemption. Within 30 days of expiry, check the renewal status in the registrar's panel rather than trusting the number here. The countdown above draws the elapsed share of registration to expiry, as a visual reference only.",
+      "faq.q7": "Is clientTransferProhibited good or bad?",
+      "faq.a7": "Usually good: it means the registrar locked transfers, so nobody can move the name away without you. Most new and recently renewed names carry it. The ones to worry about are clientHold and serverHold — those mean resolution is suspended. Each code is explained in “What the status codes mean” above.",
+      "faq.q8": "Which TLDs are supported? Why do some suffixes fail?",
+      "faq.a8": "This site follows IANA's RDAP registry, plus registries that run RDAP but are not listed by IANA, and 13 second-level suffixes served by the registries' own RDAP services; suffixes without RDAP fall back to port-43 WHOIS. A few suffixes have no machine-readable interface at all, and the lookup says so plainly instead of passing an empty result off as “unregistered”. Names under platform namespaces such as cc.cd or us.ci are also called out: the registry only records the parent domain, so the record lives inside the platform.",
+      "faq.q9": "Where do reference prices come from? Can I buy at that price?",
+      "faq.a9": "Prices are public registrar list prices collected by nazhumi.com — a snapshot of the last collection, not a live quote; CNY figures use its reference conversion. Coupon prices may have a use limit or be for new customers only, and the registrar's checkout page is final. Prices are suffix-level; they do not mean this specific domain is available.",
       "foot.blurb": "Domain registration",
       "foot.privacy": "No ads · no tracking",
       "due.title": "Expiry countdown",
@@ -399,6 +424,7 @@
       "due.suspended": "Resolution suspended",
       "due.active": "Resolving normally",
       "source.title": "Query source",
+      "source.fine": "This shows the registry endpoint actually hit this time, how long it took, and the protocol — not a generic “RDAP”. A 404 or a miss is stated plainly too, leaving nothing blank.",
       "source.badge.wait": "Waiting",
       "source.empty": "After a lookup, the registry endpoint actually hit, how long it took, and the protocol used.",
       "source.endpoint": "Endpoint",
@@ -569,7 +595,10 @@
 
   function t(key) {
     var pack = I18N[state.lang] || I18N.zh;
-    return Object.prototype.hasOwnProperty.call(pack, key) ? pack[key] : key;
+    if (Object.prototype.hasOwnProperty.call(pack, key)) return pack[key];
+    var other = state.lang === "en" ? I18N.zh : I18N.en;
+    if (other && Object.prototype.hasOwnProperty.call(other, key)) return other[key];
+    return key;
   }
 
   function dash(v) {
@@ -807,13 +836,19 @@
     var desc = document.querySelector('meta[name="description"]');
     if (desc) desc.setAttribute("content", t("desc"));
     document.querySelectorAll("[data-i18n]").forEach(function (node) {
-      node.textContent = t(node.getAttribute("data-i18n"));
+      var key = node.getAttribute("data-i18n");
+      var v = t(key);
+      if (v !== key) node.textContent = v; // unresolved: keep the HTML fallback text, never show the raw key
     });
     document.querySelectorAll("[data-i18n-html]").forEach(function (node) {
-      node.innerHTML = t(node.getAttribute("data-i18n-html"));
+      var key = node.getAttribute("data-i18n-html");
+      var v = t(key);
+      if (v !== key) node.innerHTML = v;
     });
     document.querySelectorAll("[data-i18n-placeholder]").forEach(function (node) {
-      node.setAttribute("placeholder", t(node.getAttribute("data-i18n-placeholder")));
+      var key = node.getAttribute("data-i18n-placeholder");
+      var v = t(key);
+      if (v !== key) node.setAttribute("placeholder", v);
     });
     var langBtn = $("langToggle");
     langBtn.setAttribute("aria-label", t("lang.aria"));
