@@ -12,6 +12,7 @@ import (
 	"github.com/lissy93/who-dat/internal/config"
 	"github.com/lissy93/who-dat/internal/dnsq"
 	"github.com/lissy93/who-dat/internal/lookup"
+	"github.com/lissy93/who-dat/internal/price"
 	"github.com/lissy93/who-dat/internal/rdap"
 	"github.com/lissy93/who-dat/internal/web"
 	"github.com/lissy93/who-dat/internal/whois"
@@ -20,6 +21,7 @@ import (
 type server struct {
 	cfg          *config.Config
 	svc          *lookup.Service
+	prices       *price.Service
 	files        http.Handler
 	lookupAPI    http.Handler // bare-domain lookup with API middleware applied
 	dns          dnsq.Querier
@@ -36,6 +38,7 @@ func Build(cfg *config.Config) http.Handler {
 	httpClient := &http.Client{
 		Timeout: 30 * time.Second,
 		Transport: &http.Transport{
+			Proxy:               http.ProxyFromEnvironment,
 			MaxIdleConns:        100,
 			IdleConnTimeout:     90 * time.Second,
 			TLSHandshakeTimeout: 10 * time.Second,
@@ -69,6 +72,7 @@ func newServer(cfg *config.Config, svc *lookup.Service) *server {
 		turnstileURL: "https://challenges.cloudflare.com/turnstile/v0/siteverify",
 		resendURL:    "https://api.resend.com/emails",
 	}
+	s.prices = price.New(s.httpClient)
 	if cfg.ContactRatePerMinute > 0 {
 		s.contactLimit = newLimiter(float64(cfg.ContactRatePerMinute)/60, cfg.ContactRateBurst)
 	}
@@ -86,6 +90,7 @@ func (s *server) routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("GET /v1/whois/{domain}", api(s.handleLookupPath))
 	mux.Handle("GET /multi", api(s.handleMulti))
+	mux.Handle("GET /api/price", api(s.handlePrice))
 	mux.HandleFunc("GET /health", s.handleHealth)
 	mux.HandleFunc("GET /ping", s.handleHealth)
 	mux.HandleFunc("GET /docs", s.handleDocs)

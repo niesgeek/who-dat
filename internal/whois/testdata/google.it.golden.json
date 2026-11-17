@@ -48,6 +48,20 @@
     "updated": "2026-05-07T00:54:08Z",
     "expires": "2027-04-21T00:00:00Z"
   },
+  "events": [
+    {
+      "action": "registration",
+      "date": "1999-12-10T00:00:00Z"
+    },
+    {
+      "action": "last changed",
+      "date": "2026-05-07T00:54:08Z"
+    },
+    {
+      "action": "expiration",
+      "date": "2027-04-21T00:00:00Z"
+    }
+  ],
   "contacts": {
     "registrant": {
       "name": null,
@@ -110,6 +124,8 @@
     "source": "whois",
     "server": null,
     "fetchedAt": "0001-01-01T00:00:00Z",
-    "cached": false
+    "cached": false,
+    "durationMs": 0,
+    "bytes": 1930
   }
 }

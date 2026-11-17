@@ -51,6 +51,12 @@
     "updated": null,
     "expires": null
   },
+  "events": [
+    {
+      "action": "registration",
+      "date": "1997-06-24T00:00:00Z"
+    }
+  ],
   "contacts": {
     "registrant": {
       "name": null,
@@ -113,6 +119,10 @@
     "source": "rdap",
     "server": "https://rdap.example/",
     "fetchedAt": "0001-01-01T00:00:00Z",
-    "cached": false
+    "cached": false,
+    "durationMs": 0,
+    "conformance": [
+      "rdap_level_0"
+    ]
   }
 }

@@ -3,6 +3,7 @@ package whois
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	whoisparser "github.com/likexian/whois-parser"
@@ -18,7 +19,7 @@ const rawContentType = "text/plain; charset=utf-8"
 // result is a successful "not registered" answer, not an error.
 func mapWhois(n domain.Name, raw string) (*model.Result, error) {
 	r := model.New(n.ASCII, n.ASCII, n.TLD)
-	r.Meta = model.Meta{Source: model.SourceWhois, FetchedAt: time.Now().UTC()}
+	r.Meta = model.Meta{Source: model.SourceWhois, FetchedAt: time.Now().UTC(), Bytes: len(raw)}
 	r.Raw = []byte(raw)
 	r.RawContentType = rawContentType
 	if n.IsIDN() {
@@ -62,6 +63,9 @@ func mapDomain(r *model.Result, d *whoisparser.Domain) {
 	r.Dates.Updated = timePtr(d.UpdatedDateInTime)
 	r.Dates.Expires = timePtr(d.ExpirationDateInTime)
 	r.Registrar.WhoisServer = model.Str(d.WhoisServer)
+	if d.WhoisServer != "" {
+		r.Meta.Server = model.Str(d.WhoisServer)
+	}
 	for _, ns := range d.NameServers {
 		r.Nameservers = append(r.Nameservers, model.Nameserver{
 			Name: ns,
@@ -69,6 +73,25 @@ func mapDomain(r *model.Result, d *whoisparser.Domain) {
 			IPv6: []string{},
 		})
 	}
+	// WHOIS text has no event list, so synthesize the same timeline shape
+	// RDAP returns from the three parsed dates.
+	r.Events = synthesizeEvents(r.Dates)
+}
+
+// synthesizeEvents builds a chronological event list from parsed WHOIS dates.
+func synthesizeEvents(d model.Dates) []model.Event {
+	events := []model.Event{}
+	if d.Created != nil {
+		events = append(events, model.Event{Action: "registration", Date: d.Created})
+	}
+	if d.Updated != nil {
+		events = append(events, model.Event{Action: "last changed", Date: d.Updated})
+	}
+	if d.Expires != nil {
+		events = append(events, model.Event{Action: "expiration", Date: d.Expires})
+	}
+	sort.Slice(events, func(i, j int) bool { return events[i].Date.Before(*events[j].Date) })
+	return events
 }
 
 // timePtr converts a whois-parser nullable time to the model's UTC pointer form.

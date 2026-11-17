@@ -64,3 +64,47 @@ func TestParseErrors(t *testing.T) {
 		})
 	}
 }
+
+// TestParsePlatformNamespace: names inside a platform-run namespace must fail
+// with the platform attached, never collapse into a lookup of the parent
+// (which would misreport the name as unregistered).
+func TestParsePlatformNamespace(t *testing.T) {
+	tests := []struct {
+		in       string
+		platform string
+	}{
+		{"foo.cc.cd", "DNSHE"},
+		{"a.b.us.ci", "DNSHE"},
+		{"x.de5.net", "DNSHE"},
+		{"myname.owo.name", "FurryBox"},
+		{"site.xwx.me", "FurryBox"},
+		{"hello.loc.cc", "Yunamo"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			_, err := Parse(tt.in)
+			var pe *PlatformNamespaceError
+			if !errors.As(err, &pe) {
+				t.Fatalf("Parse(%q) err = %v, want PlatformNamespaceError", tt.in, err)
+			}
+			if pe.Namespace.Name != tt.platform {
+				t.Errorf("platform = %q, want %q", pe.Namespace.Name, tt.platform)
+			}
+			if pe.Namespace.URL == "" || pe.Namespace.Suffix == "" {
+				t.Errorf("platform info incomplete: %+v", pe.Namespace)
+			}
+		})
+	}
+}
+
+func TestParsePlatformParentIsNormal(t *testing.T) {
+	// The parent domain itself is a registry record, not a platform name.
+	for _, in := range []string{"cc.cd", "owo.name", "de5.net"} {
+		if _, err := Parse(in); err != nil {
+			var pe *PlatformNamespaceError
+			if errors.As(err, &pe) {
+				t.Errorf("Parse(%q) wrongly flagged as platform namespace", in)
+			}
+		}
+	}
+}

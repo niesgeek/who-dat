@@ -47,6 +47,24 @@
     "updated": "2026-01-16T18:26:50Z",
     "expires": "2026-08-13T04:00:00Z"
   },
+  "events": [
+    {
+      "action": "registration",
+      "date": "1995-08-14T04:00:00Z"
+    },
+    {
+      "action": "last changed",
+      "date": "2026-01-16T18:26:50Z"
+    },
+    {
+      "action": "last update of rdap database",
+      "date": "2026-05-29T10:29:50Z"
+    },
+    {
+      "action": "expiration",
+      "date": "2026-08-13T04:00:00Z"
+    }
+  ],
   "contacts": {
     "registrant": {
       "name": null,
@@ -109,6 +127,12 @@
     "source": "rdap",
     "server": "https://rdap.example/",
     "fetchedAt": "0001-01-01T00:00:00Z",
-    "cached": false
+    "cached": false,
+    "durationMs": 0,
+    "conformance": [
+      "rdap_level_0",
+      "icann_rdap_technical_implementation_guide_1",
+      "icann_rdap_response_profile_1"
+    ]
   }
 }

@@ -149,6 +149,30 @@ paths:
       responses:
         "200":
           description: Laboratory report as JSON.
+  /api/price:
+    get:
+      summary: Reference prices for a suffix
+      description: >
+        Cheapest public registrar list price per step (register, renew,
+        transfer) for one suffix, from nazhumi.com's public price API, with
+        the cheapest row's coupon detail. Prices are snapshots, not live
+        quotes, and the three steps usually come from three different
+        registrars. Cached server-side for 5 minutes.
+      operationId: priceForSuffix
+      parameters:
+        - name: tld
+          in: query
+          required: true
+          schema: { type: string, example: com }
+          description: Suffix without the leading dot; may also be a bare TLD of a second-level suffix such as co.fo.
+      responses:
+        "200":
+          description: Price snapshot.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PriceResponse" }
+        "400": { $ref: "#/components/responses/Error" }
+        "502": { $ref: "#/components/responses/Error" }
   /health:
     get:
       summary: Health check
@@ -189,12 +213,20 @@ components:
         error:
           type: object
           properties:
-            code: { type: string, example: INVALID_DOMAIN }
+            code: { type: string, example: INVALID_DOMAIN, description: "Error code. PLATFORM_NAMESPACE means the name lives in a platform namespace (for example DNSHE or FurryBox) and the registry holds no record for it; see platform for where to look instead." }
             message: { type: string }
             query: { type: string }
             source: { type: string, enum: [rdap, whois], description: Lookup backend that failed, when known. }
             server: { type: string, description: Upstream server queried, when known. }
             detail: { type: string, description: Underlying error detail, for diagnostics. }
+            platform:
+              type: object
+              description: Present only with PLATFORM_NAMESPACE.
+              properties:
+                name: { type: string, example: DNSHE }
+                url: { type: string, example: "https://www.dnshe.com/" }
+                suffix: { type: string, example: cc.cd }
+                hasLookup: { type: boolean, description: Whether the platform publishes a public lookup. }
     Result:
       type: object
       properties:
@@ -236,6 +268,14 @@ components:
             created: { type: [string, "null"], format: date-time }
             updated: { type: [string, "null"], format: date-time }
             expires: { type: [string, "null"], format: date-time }
+        events:
+          type: array
+          description: Full chronological event list from the upstream (registration, last changed, transfer, expiration, last update of RDAP database, …). Dates are derived from this list; it is not truncated to the three dates above.
+          items:
+            type: object
+            properties:
+              action: { type: string, example: registration }
+              date: { type: string, format: date-time }
         contacts:
           type: object
           properties:
@@ -250,6 +290,10 @@ components:
             server: { type: [string, "null"] }
             fetchedAt: { type: string, format: date-time }
             cached: { type: boolean }
+            durationMs: { type: integer, description: Milliseconds the upstream lookup took. }
+            statusCode: { type: integer, description: Upstream HTTP status (RDAP), when known. }
+            bytes: { type: integer, description: Size of the upstream payload in bytes. }
+            conformance: { type: array, items: { type: string }, description: RDAP conformance classes from the response, when known. }
     Contact:
       type: object
       properties:
@@ -266,3 +310,36 @@ components:
             postalCode: { type: [string, "null"] }
             country: { type: [string, "null"] }
         redacted: { type: boolean }
+    PriceResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        tld: { type: string, example: com }
+        source: { type: string, example: nazhumi.com }
+        sourceUrl: { type: string, description: "Link to the source suffix page, for attribution." }
+        fetchedAt: { type: string, format: date-time }
+        updated: { type: [string, "null"], description: "Collection time of the newest row used, as recorded upstream." }
+        total: { type: integer, description: "Number of price rows returned upstream for this suffix." }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              order: { type: string, enum: [register, renew, transfer] }
+              empty: { type: boolean, description: "True when the upstream lists no price for this step." }
+              standardCny: { type: [number, "null"], description: "List price in CNY, without a coupon." }
+              origValue: { type: [number, "null"], description: "List price in the registrar's own currency." }
+              currency: { type: [string, "null"] }
+              effectiveCny: { type: [number, "null"], description: "Cheapest effective CNY price (coupon applied when one exists)." }
+              registrarCode: { type: [string, "null"] }
+              registrarName: { type: [string, "null"] }
+              registrarWeb: { type: [string, "null"] }
+              updatedtime: { type: [string, "null"], description: "Collection time of this row, as recorded upstream." }
+              promo:
+                type: object
+                properties:
+                  code: { type: [string, "null"] }
+                  priceCny: { type: [number, "null"] }
+                  limit: { type: integer, description: "Remaining coupon uses, when the upstream reports it." }
+                  newUser: { type: boolean }
+                  end: { type: [string, "null"], description: "Coupon expiry, as recorded upstream." }

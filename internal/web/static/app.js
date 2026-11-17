@@ -136,6 +136,92 @@
       "faq.a4": "页面没有第三方统计。「最近」列表只存在你这台浏览器的本地存储里，可以在上面一键清除。服务端可以开内存缓存，用来少打注册局，缓存的是查询结果，不是一份用户档案。",
       "foot.blurb": "域名注册信息",
       "foot.privacy": "无广告 · 无追踪",
+      "due.title": "到期倒计时",
+      "due.badge.wait": "等待查询",
+      "due.badge.active": "生效中",
+      "due.badge.expired": "已过期",
+      "due.badge.none": "无到期日",
+      "due.empty": "查询后这里按「注册 → 到期」的比例画出已过去的时长，并给出现在距离到期还有多久。",
+      "due.remaining": "剩余时间",
+      "due.elapsed": "已过去",
+      "due.expired": "已过期",
+      "due.from": "注册",
+      "due.to": "到期",
+      "due.days": "天",
+      "due.noExpiry": "这条记录没有到期日（例如永久注册），没有倒计时可画。",
+      "due.notRegistered": "这个域名未注册，没有到期日。",
+      "due.suspended": "解析已暂停",
+      "due.active": "解析正常",
+      "source.title": "查询来源",
+      "source.badge.wait": "等待查询",
+      "source.empty": "查询后这里显示实际命中的注册局端点，以及这一跳花了多久、走的什么协议。",
+      "source.endpoint": "命中端点",
+      "source.elapsed": "耗时",
+      "source.proto": "协议",
+      "source.whois": "WHOIS 服务",
+      "source.fetched": "抓取时间",
+      "source.bytes": "原文大小",
+      "source.protoRdap": "RDAP · HTTPS",
+      "source.protoWhois": "WHOIS · 43",
+      "source.noEndpoint": "这个后缀没有可用的注册局端点",
+      "source.noEndpointBody": "注册局没有为它开机器可读接口，RDAP 和 WHOIS 都问不到。这不是「未注册」，是不支持查询。",
+      "source.notFound": "注册局返回 404，没有这条记录",
+      "source.notFoundBody": "可能代表未注册，也可能是注册局保留域名，或刚被删除还在赎回期。要确认可注册性，得去注册商的实时下单接口。",
+      "source.platform": "这个名字在平台的命名空间里",
+      "source.platformBody": "注册局只登记到父域那层，这条记录只在平台内部，要去平台后台查。",
+      "source.platformLookup": "去平台查询",
+      "source.platformNoLookup": "这个平台没有公开的查询接口",
+      "tl.title": "事件时间线",
+      "tl.empty": "查询后按时间正序列出注册、变更、转移、到期这些节点，并标出距离现在多久。",
+      "tl.count": "{n} 个节点",
+      "ev.registration": "注册",
+      "ev.lastChanged": "最后变更",
+      "ev.expiration": "到期",
+      "ev.transfer": "转移",
+      "ev.reregistration": "重新注册",
+      "ev.dbUpdate": "注册局数据库更新",
+      "ev.lastUpdate": "最后更新",
+      "ev.unknown": "事件",
+      "mean.title": "状态码含义",
+      "mean.fine": "client* 是注册商侧的动作，server* 是注册局侧的动作；带 prohibited 的多为保护性锁，带 hold 的才是解析被停。",
+      "mean.wait": "查询后这里逐条解释注册局返回的状态码。",
+      "mean.empty": "上游没有返回状态码，这里也就没有可解释的。",
+      "price.title": "参考价格",
+      "price.help": "这个后缀在注册商处的注册、续费、转入报价，三个环节各自取当前最便宜的一家，所以很可能分属三家注册商 —— 这不是一个能照价一次买完的方案。",
+      "price.wait": "查询域名后，这里显示这个后缀的注册、续费、转入最便宜报价。",
+      "price.order.register": "注册",
+      "price.order.renew": "续费",
+      "price.order.transfer": "转入",
+      "price.noQuote": "无报价",
+      "price.noQuoteHint": "这家比价站没收录这个环节",
+      "price.std": "标准",
+      "price.coupon": "券",
+      "price.limit": "限 {n} 次",
+      "price.newUser": "仅限新用户",
+      "price.at": "采于",
+      "price.uncovered": "未收录",
+      "price.fail": "价格数据没有取到（这不影响上面的注册局记录）。",
+      "price.empty": "这家比价站还没有收录 .{tld} 的报价 —— 它收了上百家注册商、几千个后缀，但确实不是全部。",
+      "price.fine": "价格来自哪煮米收录的注册商公开挂牌价；人民币由上游按参考汇率折算，券后价与标准价都按上游记录。最终以注册商结算页为准。",
+      "price.loading": "查比价中…",
+      "price.copy": "点击复制券码",
+      "raw.title": "上游原文",
+      "raw.help": "注册局回来的原文（RDAP JSON 或 WHOIS 文本），字段一个不改 —— 上面所有结论都能对着它核。",
+      "raw.copy": "复制原文",
+      "raw.download": "下载",
+      "raw.empty": "查询后这里放注册局回来的原文。",
+      "raw.loading": "取原文中…",
+      "raw.kindRdap": "RDAP JSON",
+      "raw.kindWhois": "WHOIS 文本",
+      "raw.bytes": "{n} 字节",
+      "rel.past": "{n} {u}前",
+      "rel.future": "{n} {u}后",
+      "rel.min": "分钟",
+      "rel.hour": "小时",
+      "rel.day": "天",
+      "rel.month": "个月",
+      "rel.year": "年",
+      "err.PLATFORM_NAMESPACE": "这个名字在 {platform} 的平台命名空间里，注册局不登记这条记录，请去平台后台查",
       "reg.yes": "已注册",
       "reg.no": "未注册",
       "source.rdap": "RDAP",
@@ -296,6 +382,92 @@
       "faq.a4": "There is no third-party analytics. The recent list lives only in this browser and can be cleared above. The server may keep an in-memory cache of lookup results so it hits registries less often. That cache is not a user profile.",
       "foot.blurb": "Domain registration",
       "foot.privacy": "No ads · no tracking",
+      "due.title": "Expiry countdown",
+      "due.badge.wait": "Waiting",
+      "due.badge.active": "Active",
+      "due.badge.expired": "Expired",
+      "due.badge.none": "No expiry",
+      "due.empty": "After a lookup, the time from registration to expiry is drawn to scale, with the time left.",
+      "due.remaining": "Time remaining",
+      "due.elapsed": "elapsed",
+      "due.expired": "Expired",
+      "due.from": "Registered",
+      "due.to": "Expires",
+      "due.days": "days",
+      "due.noExpiry": "This record has no expiry date (for example a permanent registration), so there is no countdown.",
+      "due.notRegistered": "This domain is not registered, so there is no expiry date.",
+      "due.suspended": "Resolution suspended",
+      "due.active": "Resolving normally",
+      "source.title": "Query source",
+      "source.badge.wait": "Waiting",
+      "source.empty": "After a lookup, the registry endpoint actually hit, how long it took, and the protocol used.",
+      "source.endpoint": "Endpoint",
+      "source.elapsed": "Elapsed",
+      "source.proto": "Protocol",
+      "source.whois": "WHOIS service",
+      "source.fetched": "Fetched at",
+      "source.bytes": "Payload size",
+      "source.protoRdap": "RDAP · HTTPS",
+      "source.protoWhois": "WHOIS · 43",
+      "source.noEndpoint": "No registry endpoint for this suffix",
+      "source.noEndpointBody": "The registry publishes no machine-readable interface for it, so neither RDAP nor WHOIS can answer. That is not “unregistered”; it is unsupported.",
+      "source.notFound": "Registry returned 404: no record",
+      "source.notFoundBody": "It may be unregistered, or a registry-reserved name, or a name in its redemption period. Confirm availability at a registrar's live checkout.",
+      "source.platform": "This name lives in a platform namespace",
+      "source.platformBody": "The registry only records the parent domain; this record lives inside the platform. Check the platform's own records.",
+      "source.platformLookup": "Check at the platform",
+      "source.platformNoLookup": "This platform publishes no public lookup",
+      "tl.title": "Event timeline",
+      "tl.empty": "After a lookup, registration, changes, transfers, and expiry are listed oldest first, each with its distance from now.",
+      "tl.count": "{n} events",
+      "ev.registration": "Registration",
+      "ev.lastChanged": "Last changed",
+      "ev.expiration": "Expiration",
+      "ev.transfer": "Transfer",
+      "ev.reregistration": "Re-registration",
+      "ev.dbUpdate": "Registry database update",
+      "ev.lastUpdate": "Last update",
+      "ev.unknown": "Event",
+      "mean.title": "What the status codes mean",
+      "mean.fine": "client* is the registrar's side, server* is the registry's side. Most “prohibited” codes are protective locks; “hold” means resolution is suspended.",
+      "mean.wait": "After a lookup, each status code from the registry is explained here.",
+      "mean.empty": "The upstream returned no status codes, so there is nothing to explain.",
+      "price.title": "Reference prices",
+      "price.help": "Registration, renewal, and transfer prices for this suffix, each from the cheapest registrar right now — so the three may belong to three different registrars. That is not a single checkout.",
+      "price.wait": "Look up a domain and the cheapest register, renew, and transfer prices for its suffix show up here.",
+      "price.order.register": "Register",
+      "price.order.renew": "Renew",
+      "price.order.transfer": "Transfer",
+      "price.noQuote": "No quote",
+      "price.noQuoteHint": "This comparison site has no price for this step",
+      "price.std": "List",
+      "price.coupon": "Coupon",
+      "price.limit": "{n} uses",
+      "price.newUser": "New customers only",
+      "price.at": "collected",
+      "price.uncovered": "Not covered",
+      "price.fail": "Price data did not come back (the registry record above is unaffected).",
+      "price.empty": "This comparison site does not list prices for .{tld} yet — it covers over a hundred registrars and thousands of suffixes, but not all of them.",
+      "price.fine": "Prices are public registrar lists collected by nazhumi.com; CNY figures use its reference conversion, and coupon and list prices are as recorded upstream. The registrar's checkout page is final.",
+      "price.loading": "Checking prices…",
+      "price.copy": "Click to copy the coupon code",
+      "raw.title": "Upstream payload",
+      "raw.help": "The registry's own response (RDAP JSON or WHOIS text), verbatim — every conclusion above can be checked against it.",
+      "raw.copy": "Copy raw",
+      "raw.download": "Download",
+      "raw.empty": "The registry's raw response lands here after a lookup.",
+      "raw.loading": "Fetching the raw response…",
+      "raw.kindRdap": "RDAP JSON",
+      "raw.kindWhois": "WHOIS text",
+      "raw.bytes": "{n} bytes",
+      "rel.past": "{n} {u} ago",
+      "rel.future": "in {n} {u}",
+      "rel.min": "minute",
+      "rel.hour": "hour",
+      "rel.day": "day",
+      "rel.month": "month",
+      "rel.year": "year",
+      "err.PLATFORM_NAMESPACE": "This name sits in {platform}'s platform namespace; the registry does not record it. Check the platform instead",
       "reg.yes": "Registered",
       "reg.no": "Not registered",
       "source.rdap": "RDAP",
@@ -365,7 +537,12 @@
     batch: [],
     batchLoading: false,
     batchError: null,
-    batchTrim: false
+    batchTrim: false,
+    price: null,       // {loading, data, error} for the /api/price card
+    priceSeq: 0,
+    rawText: "",
+    rawKind: "",
+    rawLoading: false
   };
   var ctrl = null;
   var toastTimer = 0;
@@ -425,6 +602,93 @@
     return "";
   }
 
+  /* Full-sentence explanations for each EPP status, keyed by canonical code.
+     The record card keeps the two-word gloss; this table is the long form. */
+  var STATUS_MEAN = {
+    ok: { zh: "域名正常生效，没有额外限制。", en: "Domain is live with no extra restrictions." },
+    active: { zh: "域名正常生效，解析可用。", en: "Domain is live and resolvable." },
+    inactive: { zh: "域名未配置可用的域名服务器，解析不通。", en: "No working nameservers configured; it will not resolve." },
+    clientTransferProhibited: { zh: "注册商侧禁止转移：别人不能把它未经你同意转出。这是好事，新注册和刚续费的域名普遍带着它。", en: "Registrar-side transfer lock: nobody can move it away without you. This is good — most new and recently renewed names carry it." },
+    clientDeleteProhibited: { zh: "注册商侧禁止删除。", en: "Registrar-side delete lock." },
+    clientUpdateProhibited: { zh: "注册商侧禁止修改注册信息。", en: "Registrar-side update lock." },
+    clientRenewProhibited: { zh: "注册商侧禁止续费（通常由到期流程控制）。", en: "Registrar-side renew lock (usually managed by the expiry flow)." },
+    clientHold: { zh: "注册商暂停了解析：域名不解析，一般是欠费或争议处理中。", en: "Registrar suspended resolution — typically non-payment or a dispute." },
+    serverTransferProhibited: { zh: "注册局侧禁止转移（ccTLD 常见，锁得更死）。", en: "Registry-side transfer lock (common on ccTLDs)." },
+    serverDeleteProhibited: { zh: "注册局侧禁止删除。", en: "Registry-side delete lock." },
+    serverUpdateProhibited: { zh: "注册局侧禁止修改。", en: "Registry-side update lock." },
+    serverRenewProhibited: { zh: "注册局侧禁止续费。", en: "Registry-side renew lock." },
+    serverHold: { zh: "注册局暂停了解析，通常因为合规或争议。", en: "Registry suspended resolution, usually compliance or a dispute." },
+    pendingDelete: { zh: "已进入删除流程，到期后会被释放。", en: "In the delete flow; the name will be released." },
+    pendingTransfer: { zh: "正在转移中，等待注册局完成。", en: "Transfer in progress, awaiting the registry." },
+    pendingUpdate: { zh: "更新流程处理中。", en: "Update in progress." },
+    pendingCreate: { zh: "注册流程处理中。", en: "Creation in progress." },
+    pendingRenew: { zh: "续费流程处理中。", en: "Renewal in progress." },
+    pendingRestore: { zh: "正在从赎回期恢复。", en: "Being restored from redemption." },
+    redemptionPeriod: { zh: "赎回期：已过期并被申请删除，原持有人仍可付费赎回。", en: "Redemption: expired and queued for deletion, still recoverable for a fee." },
+    addPeriod: { zh: "新注册后的初始期。", en: "Initial period right after registration." },
+    autoRenewPeriod: { zh: "自动续费后的 45 天宽限期，仍可退款取消。", en: "45-day grace window after auto-renew, still cancellable." },
+    renewPeriod: { zh: "续费后的宽限期。", en: "Grace window after renewal." },
+    transferPeriod: { zh: "转移后的宽限期。", en: "Grace window after transfer." },
+    locked: { zh: "被注册局或注册商锁定。", en: "Locked by the registry or registrar." },
+    reserved: { zh: "被注册局保留，不对外注册。", en: "Reserved by the registry, not registrable." },
+    transferProhibited: { zh: "禁止转移。", en: "Transfer prohibited." }
+  };
+
+  function statusMean(code) {
+    var row = STATUS_MEAN[code];
+    if (!row) return "";
+    return state.lang === "en" ? row.en : row.zh;
+  }
+
+  function statusKey(s) {
+    return String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+
+  function evLabel(action) {
+    var a = String(action || "").toLowerCase();
+    if (a === "registration") return t("ev.registration");
+    if (a === "expiration") return t("ev.expiration");
+    if (a === "last changed") return t("ev.lastChanged");
+    if (a === "transfer") return t("ev.transfer");
+    if (a === "reregistration") return t("ev.reregistration");
+    if (a.indexOf("rdap database") > -1) return t("ev.dbUpdate");
+    if (a.indexOf("last update") > -1) return t("ev.lastUpdate");
+    return action || t("ev.unknown");
+  }
+
+  function fmtRel(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    var diff = d.getTime() - Date.now();
+    var abs = Math.abs(diff);
+    var n, unit;
+    if (abs < 3600e3) { n = Math.max(1, Math.round(abs / 60e3)); unit = t("rel.min"); }
+    else if (abs < 86400e3) { n = Math.max(1, Math.round(abs / 3600e3)); unit = t("rel.hour"); }
+    else if (abs < 2592e6) { n = Math.max(1, Math.round(abs / 86400e3)); unit = t("rel.day"); }
+    else if (abs < 31536e6) { n = Math.max(1, Math.round(abs / 2592e6)); unit = t("rel.month"); }
+    else { n = Math.max(1, Math.round(abs / 31536e6)); unit = t("rel.year"); }
+    if (state.lang === "en" && n !== 1 && unit !== "day") unit += "s";
+    if (state.lang === "en" && n !== 1 && unit === "day") unit = "days";
+    var tpl = diff < 0 ? t("rel.past") : t("rel.future");
+    return tpl.replace("{n}", String(n)).replace("{u}", unit);
+  }
+
+  function fmtDateTime(iso) {
+    if (!iso || iso.indexOf("0001-01-01") === 0) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    return new Intl.DateTimeFormat(state.lang === "en" ? "en-GB" : "zh-CN", {
+      year: "numeric", month: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit", timeZone: "UTC"
+    }).format(d) + " UTC";
+  }
+
+  function money(n) {
+    if (n == null || !isFinite(n)) return null;
+    return Number(n).toFixed(2).replace(/\.00$/, "").replace(/(\.\d)0$/, "$1");
+  }
+
   function safeHttp(url) {
     try {
       var u = new URL(url);
@@ -466,6 +730,9 @@
 
   function errorText(err) {
     if (!err) return t("err.generic");
+    if (err.code === "PLATFORM_NAMESPACE" && err.platform && err.platform.name) {
+      return t("err.PLATFORM_NAMESPACE").replace("{platform}", err.platform.name);
+    }
     if (err.code && I18N[state.lang]["err." + err.code]) return t("err." + err.code);
     return err.message || t("err.generic");
   }
@@ -817,6 +1084,380 @@
     ]));
   }
 
+  function paintSource() {
+    var host = $("sourceBody");
+    var badge = $("sourceBadge");
+    var r = state.result;
+    var err = state.error;
+    if (err && err.code === "UNSUPPORTED_TLD") {
+      badge.textContent = t("source.badge.wait");
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("strong", { text: t("source.noEndpoint") }),
+        el("p", { text: t("source.noEndpointBody") })
+      ]));
+      return;
+    }
+    if (err && err.code === "PLATFORM_NAMESPACE") {
+      badge.textContent = t("source.badge.wait");
+      badge.className = "badge badge-grey";
+      var p = err.platform || {};
+      var kids = [
+        el("strong", { text: t("source.platform") }),
+        el("p", { text: t("source.platformBody") })
+      ];
+      if (p.url) {
+        kids.push(p.hasLookup
+          ? el("a", { href: p.url, target: "_blank", rel: "noopener noreferrer", text: t("source.platformLookup") })
+          : el("p", { class: "fine", text: t("source.platformNoLookup") }));
+      }
+      host.replaceChildren(el("div", { class: "empty" }, kids));
+      return;
+    }
+    if (!r) {
+      badge.textContent = t("source.badge.wait");
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("strong", { text: t("source.title") }),
+        el("p", { text: t("source.empty") })
+      ]));
+      return;
+    }
+    var meta = r.meta || {};
+    var src = sourceText(meta);
+    badge.textContent = src ? src.toUpperCase() : t("source.badge.wait");
+    badge.className = "badge badge-lime";
+    var proto = "";
+    if (meta.source === "whois") proto = t("source.protoWhois");
+    else if (meta.conformance && meta.conformance.length) {
+      proto = t("source.protoRdap") + " · " + meta.conformance[0] + (meta.conformance.length > 1 ? " +" + (meta.conformance.length - 1) : "");
+    } else proto = t("source.protoRdap");
+    var elapsed = meta.durationMs ? String(meta.durationMs) + " ms" : "—";
+    if (meta.cached) elapsed += " · " + t("cached");
+    var rows = [
+      kvRow(t("source.endpoint"), meta.server || ""),
+      kvRow(t("source.elapsed"), elapsed),
+      kvRow(t("source.proto"), proto),
+      kvRow(t("source.whois"), (r.registrar && r.registrar.whoisServer) || (meta.source === "whois" ? meta.server || "" : "")),
+      kvRow(t("source.fetched"), fmtDateTime(meta.fetchedAt)),
+      kvRow(t("source.bytes"), meta.bytes ? t("raw.bytes").replace("{n}", String(meta.bytes)) : "")
+    ];
+    host.replaceChildren(el("dl", { class: "kv" }, rows));
+  }
+
+  function paintDue() {
+    var host = $("dueBody");
+    var badge = $("dueBadge");
+    var r = state.result;
+    if (!r) {
+      badge.textContent = t("due.badge.wait");
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("strong", { text: t("due.title") }),
+        el("p", { text: t("due.empty") })
+      ]));
+      return;
+    }
+    var dates = r.dates || {};
+    if (!r.isRegistered) {
+      badge.textContent = t("due.badge.none");
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("p", { class: "fine", text: t("due.notRegistered") }));
+      return;
+    }
+    if (!dates.expires) {
+      badge.textContent = t("due.badge.none");
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("p", { class: "fine", text: t("due.noExpiry") }));
+      return;
+    }
+    var now = Date.now();
+    var expires = new Date(dates.expires).getTime();
+    var created = dates.created ? new Date(dates.created).getTime() : NaN;
+    var leftDays = Math.ceil((expires - now) / 86400000);
+    var pct = 0;
+    if (!isNaN(created) && expires > created) {
+      pct = Math.min(100, Math.max(0, ((now - created) / (expires - created)) * 100));
+    }
+    var suspended = (r.status || []).some(function (s) { return String(s).toLowerCase().indexOf("hold") >= 0; });
+    var expired = leftDays < 0;
+    badge.textContent = expired ? t("due.badge.expired") : t("due.badge.active");
+    badge.className = "badge " + (expired ? "badge-coral" : "badge-lime");
+    var fillColor = expired ? "var(--coral)" : leftDays < 30 ? "var(--coral)" : leftDays < 90 ? "var(--amber)" : "var(--violet)";
+    var num = el("div", { class: "due-num" }, [
+      el("span", { text: expired ? t("due.expired") : String(leftDays) }),
+      expired ? null : el("small", { text: " " + t("due.days") })
+    ]);
+    var bar = el("div", { class: "due-bar" }, [
+      el("div", { class: "due-fill", style: "width:" + pct.toFixed(1) + "%;background:" + fillColor })
+    ]);
+    var range = el("div", { class: "due-range" }, [
+      el("span", { text: t("due.from") + " " + (fmtDate(dates.created) || "—") }),
+      el("span", { text: t("due.elapsed") + " " + Math.round(pct) + "%" }),
+      el("span", { text: t("due.to") + " " + (fmtDate(dates.expires) || "—") })
+    ]);
+    var flag = el("p", { class: "fine" }, [
+      el("span", { class: "pill " + (suspended ? "pill-pink" : "pill-lime"), text: suspended ? t("due.suspended") : t("due.active") })
+    ]);
+    host.replaceChildren(
+      el("div", { class: "due-top" }, [el("div", { text: t("due.remaining") }), num]),
+      bar, range, flag
+    );
+  }
+
+  function timelineEvents(r) {
+    var evs = (r && r.events) || [];
+    if (evs.length) return evs;
+    var dates = (r && r.dates) || {};
+    var out = [];
+    if (dates.created) out.push({ action: "registration", date: dates.created });
+    if (dates.updated) out.push({ action: "last changed", date: dates.updated });
+    if (dates.expires) out.push({ action: "expiration", date: dates.expires });
+    out.sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
+    return out;
+  }
+
+  function paintTimeline() {
+    var host = $("timelineBody");
+    var count = $("tlCount");
+    var r = state.result;
+    var evs = r ? timelineEvents(r) : [];
+    if (!evs.length) {
+      count.hidden = true;
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("strong", { text: t("tl.title") }),
+        el("p", { text: t("tl.empty") })
+      ]));
+      return;
+    }
+    count.hidden = false;
+    count.textContent = t("tl.count").replace("{n}", String(evs.length));
+    var rows = evs.map(function (e) {
+      var rel = fmtRel(e.date);
+      return el("div", { class: "tl-row" }, [
+        el("span", { class: "tl-dot", "aria-hidden": "true" }),
+        el("div", { class: "tl-body" }, [
+          el("div", { class: "tl-name", text: evLabel(e.action) }),
+          el("div", { class: "tl-meta", text: fmtDateTime(e.date) + (rel ? " · " + rel : "") })
+        ])
+      ]);
+    });
+    host.replaceChildren(el("div", { class: "tl" }, rows));
+  }
+
+  function paintStatusMeanings() {
+    var host = $("statusBody");
+    var r = state.result;
+    var codes = (r && r.status) || [];
+    if (!codes.length) {
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("strong", { text: t("mean.title") }),
+        el("p", { text: r ? t("mean.empty") : t("mean.wait") })
+      ]));
+      return;
+    }
+    var rows = codes.map(function (code) {
+      var mean = statusMean(code) || gloss(code) || "";
+      return el("div", { class: "mean-row " + statusTone(code) }, [
+        el("span", { class: "mean-code", text: code }),
+        el("span", { class: "mean-text", text: mean || "—" })
+      ]);
+    });
+    host.replaceChildren(el("div", { class: "mean-list" }, rows));
+  }
+
+  function priceWhen(s) {
+    var m = String(s || "").match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+    return m ? m[2] + "-" + m[3] + " " + m[4] + ":" + m[5] : String(s || "");
+  }
+
+  function priceTile(order, it) {
+    var label = t("price.order." + order);
+    if (!it || it.empty || it.effectiveCny == null) {
+      var why = it && it.origValue != null && it.currency
+        ? money(it.origValue) + " " + String(it.currency).toUpperCase()
+        : t("price.noQuoteHint");
+      return el("div", { class: "price-tile is-empty" }, [
+        el("span", { class: "price-kind", text: label }),
+        el("div", { class: "price-num is-na", text: t("price.noQuote") }),
+        el("div", { class: "price-meta", text: why })
+      ]);
+    }
+    var tags = [];
+    if (it.promo && it.promo.code) {
+      tags.push(el("button", {
+        type: "button", class: "price-code", "data-code": it.promo.code,
+        title: t("price.copy"), "aria-label": t("price.copy") + " " + it.promo.code
+      }, [el("span", { class: "price-code-k", text: t("price.coupon") }), el("b", { text: it.promo.code })]));
+    }
+    if (it.registrarName) {
+      tags.push(it.registrarWeb
+        ? el("a", { class: "price-reg", href: it.registrarWeb, target: "_blank", rel: "noopener noreferrer", text: it.registrarName + " ↗" })
+        : el("span", { class: "price-reg is-plain", text: it.registrarName }));
+    }
+    var bits = [];
+    if (it.promo && it.promo.priceCny != null) {
+      if (it.standardCny != null) bits.push(t("price.std") + " ¥" + money(it.standardCny));
+      if (it.promo.limit) bits.push(t("price.limit").replace("{n}", String(it.promo.limit)));
+      if (it.promo.newUser) bits.push(t("price.newUser"));
+    } else if (it.currency && String(it.currency).toLowerCase() !== "cny" && it.origValue != null) {
+      bits.push(money(it.origValue) + " " + String(it.currency).toUpperCase());
+    }
+    if (it.updatedtime) bits.push(t("price.at") + " " + priceWhen(it.updatedtime));
+    return el("div", { class: "price-tile" }, [
+      el("span", { class: "price-kind", text: label }),
+      el("div", { class: "price-num" }, [
+        document.createTextNode("¥" + money(it.effectiveCny)),
+        el("span", { class: "price-cur", text: "CNY" })
+      ]),
+      el("div", { class: "price-tags" }, tags),
+      el("div", { class: "price-meta", text: bits.join(" · ") })
+    ]);
+  }
+
+  function paintPrice() {
+    var host = $("priceBody");
+    var badge = $("priceBadge");
+    var fine = $("priceFine");
+    var p = state.price;
+    fine.textContent = "";
+    if (!p) {
+      badge.textContent = "—";
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("p", { text: t("price.wait") })
+      ]));
+      return;
+    }
+    if (p.loading) {
+      badge.textContent = t("price.loading");
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "price-grid" }, ["register", "renew", "transfer"].map(function (o) {
+        return el("div", { class: "price-tile is-empty" }, [
+          el("span", { class: "price-kind", text: t("price.order." + o) }),
+          el("div", { class: "price-num is-na", text: "…" })
+        ]);
+      })));
+      return;
+    }
+    if (p.error || !p.data) {
+      badge.textContent = "—";
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "empty" }, [el("p", { text: t("price.fail") })]));
+      return;
+    }
+    var data = p.data;
+    var items = data.items || [];
+    var quoted = items.filter(function (x) { return x && !x.empty && x.effectiveCny != null; });
+    if (!quoted.length) {
+      badge.textContent = t("price.uncovered");
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("p", { text: t("price.empty").replace("{tld}", data.tld || "") })
+      ]));
+      return;
+    }
+    var byOrder = {};
+    items.forEach(function (x) { if (x && x.order) byOrder[x.order] = x; });
+    host.replaceChildren(el("div", { class: "price-grid" }, ["register", "renew", "transfer"].map(function (o) {
+      return priceTile(o, byOrder[o]);
+    })));
+    badge.textContent = "nazhumi" + (data.updated ? " · " + priceWhen(data.updated) : "");
+    badge.className = "badge badge-lime";
+    if (data.updated) badge.title = String(data.updated);
+    var link = data.sourceUrl
+      ? el("a", { href: data.sourceUrl, target: "_blank", rel: "noopener noreferrer", text: "nazhumi.com" })
+      : null;
+    fine.replaceChildren(link, link ? document.createTextNode(" · " + t("price.fine")) : document.createTextNode(t("price.fine")));
+  }
+
+  function loadPrice(r) {
+    if (!r) return;
+    var labels = String(r.domain || r.query || "").split(".");
+    var cands = [];
+    if (labels.length >= 3) cands.push(labels.slice(-2).join("."));
+    if (r.tld) cands.push(r.tld);
+    cands = cands.filter(function (v, i) { return v && cands.indexOf(v) === i; });
+    if (!cands.length) return;
+    state.priceSeq++;
+    var seq = state.priceSeq;
+    state.price = { loading: true };
+    paintPrice();
+    var i = 0;
+    function next() {
+      if (seq !== state.priceSeq) return;
+      if (i >= cands.length) {
+        state.price = { error: true };
+        paintPrice();
+        return;
+      }
+      var tld = cands[i++];
+      fetchJSON("/api/price?tld=" + encodeURIComponent(tld)).then(function (data) {
+        if (seq !== state.priceSeq) return;
+        var quoted = (data.items || []).some(function (x) { return x && !x.empty && x.effectiveCny != null; });
+        if (quoted || i >= cands.length) {
+          state.price = { data: data };
+          paintPrice();
+        } else next();
+      }, function () {
+        if (seq !== state.priceSeq) return;
+        next();
+      });
+    }
+    next();
+  }
+
+  function paintRaw() {
+    var host = $("rawBody");
+    var pre = $("rawPre");
+    var meta = $("rawMeta");
+    $("rawCopy").disabled = !state.rawText;
+    $("rawDownload").disabled = !state.rawText;
+    if (state.rawLoading) {
+      host.replaceChildren(el("div", { class: "empty" }, [el("p", { text: t("raw.loading") })]));
+      pre.hidden = true;
+      pre.textContent = "";
+      meta.textContent = "";
+      return;
+    }
+    if (!state.rawText) {
+      host.replaceChildren(el("div", { class: "empty" }, [
+        el("strong", { text: t("raw.title") }),
+        el("p", { text: t("raw.empty") })
+      ]));
+      pre.hidden = true;
+      pre.textContent = "";
+      meta.textContent = "";
+      return;
+    }
+    host.replaceChildren();
+    pre.hidden = false;
+    pre.textContent = state.rawText;
+    var kind = state.rawKind === "whois" ? t("raw.kindWhois") : t("raw.kindRdap");
+    meta.textContent = kind + " · " + t("raw.bytes").replace("{n}", String(state.rawText.length));
+  }
+
+  function loadRaw(r) {
+    if (!r) return;
+    var q = r.domain || r.query || "";
+    if (!q) return;
+    state.rawLoading = true;
+    state.rawText = "";
+    state.rawKind = (r.meta && r.meta.source) || "";
+    paintRaw();
+    fetch("/v1/whois/" + encodeURIComponent(q) + "?raw=true").then(function (res) {
+      if (!res.ok) throw new Error("raw " + res.status);
+      return res.text();
+    }).then(function (text) {
+      state.rawText = text;
+      state.rawLoading = false;
+      paintRaw();
+    }, function () {
+      state.rawLoading = false;
+      paintRaw();
+    });
+  }
+
   function domainTokens(raw) {
     var seen = Object.create(null);
     var out = [];
@@ -952,6 +1593,12 @@
     paintRecord();
     paintNS();
     paintContacts();
+    paintSource();
+    paintDue();
+    paintTimeline();
+    paintStatusMeanings();
+    paintPrice();
+    paintRaw();
     $("searchBtn").disabled = state.loading;
     $("searchBtn").textContent = state.loading ? t("btn.searching") : t("btn.search");
     $("q").setAttribute("aria-busy", state.loading ? "true" : "false");
@@ -971,6 +1618,7 @@
           var wrapped = new Error(err.message || "");
           wrapped.code = err.code || "";
           wrapped.detail = err.detail || "";
+          wrapped.platform = err.platform || null;
           throw wrapped;
         }
         if (!data) {
@@ -1012,11 +1660,20 @@
       state.showJson = false;
       $("jsonToggle").textContent = t("record.json");
       $("jsonToggle").setAttribute("aria-pressed", "false");
+      state.price = null;
+      state.rawText = "";
+      state.rawLoading = false;
       remember(data.domain || q);
+      loadPrice(data);
+      loadRaw(data);
     }, function (err) {
       if (err && err.name === "AbortError") return;
       if (mine.signal.aborted) return;
       state.error = err;
+      state.result = null;
+      state.price = null;
+      state.rawText = "";
+      state.rawLoading = false;
     }).then(function () {
       if (ctrl !== mine) return;
       state.loading = false;
@@ -1151,6 +1808,28 @@
       paintBatch();
     });
     $("batchCsv").addEventListener("click", exportCSV);
+    $("rawCopy").addEventListener("click", function () {
+      if (state.rawText) copyText(state.rawText);
+    });
+    $("rawDownload").addEventListener("click", function () {
+      if (!state.rawText) return;
+      var r = state.result || {};
+      var ext = state.rawKind === "whois" ? ".whois.txt" : ".rdap.json";
+      var blob = new Blob([state.rawText], { type: state.rawKind === "whois" ? "text/plain;charset=utf-8" : "application/json;charset=utf-8" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = (r.domain || r.query || "whois") + ext;
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    });
+    document.body.addEventListener("click", function (e) {
+      var codeBtn = e.target.closest("[data-code]");
+      if (codeBtn) {
+        copyText(codeBtn.getAttribute("data-code"));
+      }
+    });
   }
 
   var storedLang = readStore(LANG_KEY, null);

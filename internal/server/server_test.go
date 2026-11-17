@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/lissy93/who-dat/internal/price"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -448,5 +449,67 @@ func TestHealth(t *testing.T) {
 	newTestServer(nil, nil).ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/health", nil))
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d", rec.Code)
+	}
+}
+
+func TestPriceEndpoint(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `{"code":100,"data":{"count":1,"domain":"com","order":"register","page":1,"total":1,"price":[{"registrar":"spaceship","registrarname":"Spaceship","registrarweb":"https://www.spaceship.com/","currency":"usd","register":9.68,"register_cny":64.52,"register_eff_cny":21.2,"renew":10.88,"renew_cny":72.52,"renew_eff_cny":72.52,"transfer":10.38,"transfer_cny":69.19,"transfer_eff_cny":26.26,"promocode":{"register":true,"renew":false,"transfer":false},"updatedtime":"2026-11-17 21:40:33"}]}}`)
+	}))
+	defer upstream.Close()
+
+	cfg := &config.Config{LookupTimeout: 2_000_000_000, MaxDomains: 5}
+	svc := lookup.NewService(&fakeSource{err: srcerr.ErrNoSource}, &fakeSource{err: srcerr.ErrNoSource}, nil)
+	s := newServer(cfg, svc)
+	s.prices = price.NewWithBase(upstream.Client(), upstream.URL, 5*time.Minute)
+	h := s.routes()
+
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/price?tld=com", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, body %s", rec.Code, rec.Body)
+	}
+	var body struct {
+		OK     bool   `json:"ok"`
+		TLD    string `json:"tld"`
+		Source string `json:"source"`
+		Items  []struct {
+			Order        string   `json:"order"`
+			Empty        bool     `json:"empty"`
+			EffectiveCNY *float64 `json:"effectiveCny"`
+		} `json:"items"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if !body.OK || body.TLD != "com" || body.Source != "nazhumi.com" || len(body.Items) != 3 {
+		t.Fatalf("unexpected price body: %+v", body)
+	}
+	if body.Items[0].Empty || body.Items[0].EffectiveCNY == nil || *body.Items[0].EffectiveCNY != 21.2 {
+		t.Errorf("register item = %+v, want 21.2", body.Items[0])
+	}
+
+	bad := httptest.NewRecorder()
+	h.ServeHTTP(bad, httptest.NewRequest(http.MethodGet, "/api/price?tld=com/", nil))
+	if bad.Code != http.StatusBadRequest {
+		t.Errorf("bad suffix status = %d, want 400", bad.Code)
+	}
+}
+
+func TestPlatformNamespaceError(t *testing.T) {
+	rec := httptest.NewRecorder()
+	newTestServer(nil, nil).ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/v1/whois/foo.cc.cd", nil))
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want 400 (body %s)", rec.Code, rec.Body)
+	}
+	var body errorBody
+	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if body.Error.Code != codePlatformNS {
+		t.Fatalf("error code = %q, want %q", body.Error.Code, codePlatformNS)
+	}
+	if body.Error.Platform == nil || body.Error.Platform.Name != "DNSHE" {
+		t.Fatalf("platform info = %+v, want DNSHE", body.Error.Platform)
 	}
 }

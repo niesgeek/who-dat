@@ -230,6 +230,64 @@
         <div id="nsBody"></div>
       </section>
 
+      <section class="card card-due" id="due">
+        <div class="card-head">
+          <h2 class="h2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.2"></circle>
+              <path d="M12 7.5 V12 l3 2"></path>
+            </svg>
+            <span data-i18n="due.title">到期倒计时</span>
+          </h2>
+          <span class="badge badge-grey" id="dueBadge" data-i18n="due.badge.wait">等待查询</span>
+        </div>
+        <div id="dueBody"></div>
+      </section>
+
+      <section class="card card-source" id="source">
+        <div class="card-head">
+          <h2 class="h2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.2"></circle>
+              <path d="M12 2.5 v3 M12 18.5 v3 M2.5 12 h3 M18.5 12 h3"></path>
+            </svg>
+            <span data-i18n="source.title">查询来源</span>
+          </h2>
+          <span class="badge badge-grey" id="sourceBadge" data-i18n="source.badge.wait">等待查询</span>
+        </div>
+        <div id="sourceBody"></div>
+        <p class="fine" data-i18n="source.fine">这里写的是这一次查询真实命中的注册局端点、花了多久、走的什么协议 —— 不是一句笼统的「RDAP」。404 或查不到时也会如实写，不留一片空白。</p>
+      </section>
+
+      <section class="card card-timeline" id="timeline">
+        <div class="card-head">
+          <h2 class="h2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <path d="M4 6 h16 M4 12 h16 M4 18 h10"></path>
+              <circle cx="4" cy="6" r="1.6" fill="currentColor" stroke="none"></circle>
+              <circle cx="4" cy="12" r="1.6" fill="currentColor" stroke="none"></circle>
+              <circle cx="4" cy="18" r="1.6" fill="currentColor" stroke="none"></circle>
+            </svg>
+            <span data-i18n="tl.title">事件时间线</span>
+          </h2>
+          <span class="count" id="tlCount" hidden></span>
+        </div>
+        <div id="timelineBody"></div>
+      </section>
+
+      <section class="card card-mean" id="statusMeanings">
+        <div class="card-head">
+          <h2 class="h2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 6 h16 M4 11 h16 M4 16 h10"></path>
+            </svg>
+            <span data-i18n="mean.title">状态码含义</span>
+          </h2>
+        </div>
+        <div id="statusBody"></div>
+        <p class="fine" data-i18n="mean.fine">client* 是注册商侧的动作，server* 是注册局侧的动作；带 prohibited 的多为保护性锁，带 hold 的才是解析被停。</p>
+      </section>
+
       <section class="card card-contacts" id="contacts">
         <div class="card-head">
           <h2 class="h2">
@@ -280,6 +338,43 @@
         </div>
       </section>
 
+      <section class="card card-price" id="price">
+        <div class="card-head">
+          <h2 class="h2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3.5 9.5 V6.8 a2 2 0 0 1 2 -2 h13 a2 2 0 0 1 2 2 v10.4 a2 2 0 0 1 -2 2 h-13 a2 2 0 0 1 -2 -2 v-2.7"></path>
+              <path d="M3.5 9.5 h17 M3.5 14.5 h17"></path>
+            </svg>
+            <span data-i18n="price.title">参考价格</span>
+          </h2>
+          <span class="badge badge-grey" id="priceBadge">—</span>
+        </div>
+        <p class="fine" data-i18n="price.help">这个后缀在注册商处的注册、续费、转入报价，三个环节各自取当前最便宜的一家，所以很可能分属三家注册商 —— 这不是一个能照价一次买完的方案。</p>
+        <div id="priceBody"></div>
+        <p class="fine" id="priceFine"></p>
+      </section>
+
+      <section class="card card-raw" id="raw">
+        <div class="card-head">
+          <h2 class="h2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 7 l-3 5 l3 5"></path>
+              <path d="M19 7 l3 5 l-3 5"></path>
+              <path d="M14 5 l-4 14"></path>
+            </svg>
+            <span data-i18n="raw.title">上游原文</span>
+          </h2>
+          <div class="card-tools">
+            <button type="button" class="mini" id="rawCopy" data-i18n="raw.copy" disabled>复制原文</button>
+            <button type="button" class="mini" id="rawDownload" data-i18n="raw.download" disabled>下载</button>
+          </div>
+        </div>
+        <p class="fine" data-i18n="raw.help">注册局回来的原文（RDAP JSON 或 WHOIS 文本），字段一个不改 —— 上面所有结论都能对着它核。</p>
+        <div id="rawBody"></div>
+        <pre class="raw" id="rawPre" hidden></pre>
+        <p class="fine" id="rawMeta"></p>
+      </section>
+
       <section class="card card-api" id="api">
         <div class="card-head">
           <h2 class="h2">
@@ -323,6 +418,8 @@
           <li data-i18n="about.n2">两种来源收成同一套字段：是否注册、注册商、日期、状态码、名称服务器、DNSSEC、联系人。</li>
           <li data-i18n="about.n3">速率看部署方式。放在 Vercel 上时，匿名访问默认大约每分钟 30 次。</li>
           <li data-i18n="about.n4">这是注册信息，不是「这个站安不安全」的结论。页面不加载广告或统计脚本。</li>
+          <li data-i18n="about.n5">参考价格是后缀级报价快照，来自哪煮米收录的公开挂牌价；最终以注册商结算页为准。</li>
+          <li data-i18n="about.n6">少数后缀没有机器可读接口，或名字只在平台内部登记 —— 这两种情况都会明说，不拿空结果冒充「未注册」。</li>
         </ul>
       </section>
 
@@ -353,6 +450,26 @@
           <summary><span data-i18n="faq.q4">会记录我查过什么吗？</span></summary>
           <p data-i18n="faq.a4">页面没有第三方统计。「最近」列表只存在你这台浏览器的本地存储里，可以在上面一键清除。服务端可以开内存缓存，用来少打注册局，缓存的是查询结果，不是一份用户档案。</p>
         </details>
+        <details class="qa">
+          <summary><span data-i18n="faq.q5">返回「未注册」是不是说明这个域名可以注册？</span></summary>
+          <p data-i18n="faq.a5">不一定。注册局没有这条公开记录，可能代表未注册，也可能是注册局保留域名、刚被删除还在赎回期，或者该注册局对某些名字不公开。要确认可注册性，得去注册商的实时下单接口。</p>
+        </details>
+        <details class="qa">
+          <summary><span data-i18n="faq.q6">到期时间准吗？能拿来判断会不会掉？</span></summary>
+          <p data-i18n="faq.a6">准的是「注册局当前登记的到期日」，但它在续费、转移、赎回期都会变。临界 30 天内建议直接看注册商后台的续费状态，别只信这里的数字。上面的倒计时按「注册 → 到期」的比例画出已过去的时长，只做直观参考。</p>
+        </details>
+        <details class="qa">
+          <summary><span data-i18n="faq.q7">状态码里 clientTransferProhibited 是好是坏？</span></summary>
+          <p data-i18n="faq.a7">通常是好：它意味着注册商侧锁住了转移，别人没法在你不知情时把域名转走。新注册和刚续费的域名普遍带着它。真正要担心的是 clientHold / serverHold —— 那表示解析被暂停了。每个状态码的具体意思见上面的「状态码含义」。</p>
+        </details>
+        <details class="qa">
+          <summary><span data-i18n="faq.q8">支持哪些顶级域？为什么有的后缀查不到？</span></summary>
+          <p data-i18n="faq.a8">本站走 IANA 的 RDAP 注册表，外加一批实测有 RDAP、但 IANA 没登记的注册局，以及 13 个二级后缀的注册局自营 RDAP 服务；没有 RDAP 的后缀退回端口 43 的 WHOIS。剩下少数后缀连注册局都没开机器可读接口，输入时会明确说「没有接口」，不拿空结果冒充未注册。另外 cc.cd、us.ci 这类平台在自己域名下切出来的三级名，注册局只登记到父域那层，本站会明确说明这条记录只在平台内部、要去平台后台查。</p>
+        </details>
+        <details class="qa">
+          <summary><span data-i18n="faq.q9">参考价格是哪来的？能直接按这个价买吗？</span></summary>
+          <p data-i18n="faq.a9">价格来自哪煮米收录的注册商公开挂牌价，是最近一次采集入库的快照，不是实时行情；人民币由上游按参考汇率折算。带券的价格还有限用次数或仅限新用户，最终以注册商结算页为准。报价只覆盖后缀级价格，不代表这个具体域名可注册。</p>
+        </details>
       </section>
     </main>
 
@@ -373,6 +490,10 @@
         </div>
         <div class="foot-r">
           <a class="foot-link" href="/dns">DNS</a>
+          <span class="foot-sep" aria-hidden="true">·</span>
+          <a class="foot-link" href="https://ns.fs.kg" target="_blank" rel="noopener noreferrer">ns.fs.kg</a>
+          <span class="foot-sep" aria-hidden="true">·</span>
+          <a class="foot-link" href="https://ip.fs.kg" target="_blank" rel="noopener noreferrer">ip.fs.kg</a>
           <span class="foot-sep" aria-hidden="true">·</span>
           <a class="foot-link" href="/contact" data-i18n="nav.contact">联系</a>
           <span class="foot-sep" aria-hidden="true">·</span>

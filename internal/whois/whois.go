@@ -24,10 +24,12 @@ func NewClient() *Client { return &Client{} }
 
 // Lookup queries WHOIS for n, honoring ctx cancellation/deadline
 func (c *Client) Lookup(ctx context.Context, n domain.Name) (*model.Result, error) {
+	start := time.Now()
 	r, err := c.query(ctx, n)
 	if err != nil {
 		return nil, &srcerr.SourceError{Source: model.SourceWhois, Err: err}
 	}
+	r.Meta.DurationMs = time.Since(start).Milliseconds()
 	return r, nil
 }
 

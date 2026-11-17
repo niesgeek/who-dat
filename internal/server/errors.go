@@ -15,6 +15,7 @@ import (
 const (
 	codeInvalidDomain    = "INVALID_DOMAIN"
 	codeUnsupportedTLD   = "UNSUPPORTED_TLD"
+	codePlatformNS       = "PLATFORM_NAMESPACE"
 	codeRateLimited      = "RATE_LIMITED"
 	codeMethodNotAllowed = "METHOD_NOT_ALLOWED"
 	codeUpstreamError    = "UPSTREAM_ERROR"
@@ -22,17 +23,28 @@ const (
 	codeInternal         = "INTERNAL_ERROR"
 )
 
+// platformInfo names the platform that actually holds a record for a
+// platform-run namespace, so the frontend can point at it instead of
+// reporting the name as unregistered.
+type platformInfo struct {
+	Name      string `json:"name"`
+	URL       string `json:"url"`
+	Suffix    string `json:"suffix"`
+	HasLookup bool   `json:"hasLookup"`
+}
+
 type errorBody struct {
 	Error errorDetail `json:"error"`
 }
 
 type errorDetail struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-	Query   string `json:"query"`
-	Source  string `json:"source,omitempty"` // lookup backend that failed: "rdap" or "whois"
-	Server  string `json:"server,omitempty"` // upstream server queried, when known
-	Detail  string `json:"detail,omitempty"` // underlying error chain, for diagnostics
+	Code     string        `json:"code"`
+	Message  string        `json:"message"`
+	Query    string        `json:"query"`
+	Source   string        `json:"source,omitempty"` // lookup backend that failed: "rdap" or "whois"
+	Server   string        `json:"server,omitempty"` // upstream server queried, when known
+	Detail   string        `json:"detail,omitempty"` // underlying error chain, for diagnostics
+	Platform *platformInfo `json:"platform,omitempty"`
 }
 
 // writeError sends the standard error envelope with the given status.
@@ -42,6 +54,22 @@ func writeError(w http.ResponseWriter, status int, code, message, query string) 
 
 // writeDomainError maps a domain.Parse error to a 400 envelope.
 func writeDomainError(w http.ResponseWriter, err error, query string) {
+	var pe *domain.PlatformNamespaceError
+	if errors.As(err, &pe) {
+		ns := pe.Namespace
+		writeJSON(w, http.StatusBadRequest, errorBody{Error: errorDetail{
+			Code:    codePlatformNS,
+			Message: "platform-run namespace, not a registry record",
+			Query:   query,
+			Platform: &platformInfo{
+				Name:      ns.Name,
+				URL:       ns.URL,
+				Suffix:    ns.Suffix,
+				HasLookup: ns.HasLookup,
+			},
+		}})
+		return
+	}
 	switch {
 	case errors.Is(err, domain.ErrNoPublicSuffix):
 		writeError(w, http.StatusBadRequest, codeInvalidDomain, "no valid public suffix", query)

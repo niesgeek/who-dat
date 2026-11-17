@@ -62,6 +62,7 @@ func (c *Client) Lookup(ctx context.Context, n domain.Name) (*model.Result, erro
 
 // get fetches and maps the domain object from the RDAP server at base.
 func (c *Client) get(ctx context.Context, n domain.Name, base string) (*model.Result, error) {
+	start := time.Now()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, base+"/domain/"+n.ASCII, nil)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", srcerr.ErrUpstream, err)
@@ -78,12 +79,24 @@ func (c *Client) get(ctx context.Context, n domain.Name, base string) (*model.Re
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(io.LimitReader(resp.Body, maxBody))
+	elapsed := time.Since(start)
+
+	stamp := func(r *model.Result) *model.Result {
+		r.Meta.DurationMs = elapsed.Milliseconds()
+		r.Meta.StatusCode = resp.StatusCode
+		r.Meta.Bytes = len(body)
+		return r
+	}
 
 	switch {
 	case resp.StatusCode == http.StatusOK:
-		return mapDomain(n, base, body)
+		r, err := mapDomain(n, base, body)
+		if err != nil {
+			return nil, err
+		}
+		return stamp(r), nil
 	case resp.StatusCode == http.StatusNotFound:
-		return notRegistered(n, base, body), nil
+		return stamp(notRegistered(n, base, body)), nil
 	case resp.StatusCode == http.StatusTooManyRequests:
 		return nil, &srcerr.RateLimited{RetryAfter: retryAfter(resp), Err: fmt.Errorf("rdap %s", base)}
 	default:

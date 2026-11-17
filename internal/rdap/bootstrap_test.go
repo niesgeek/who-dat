@@ -19,6 +19,16 @@ func TestSeedsAreSane(t *testing.T) {
 			}
 		}
 	}
+	for suffix, urls := range suffixSeeds {
+		if suffix != strings.ToLower(suffix) || len(urls) == 0 {
+			t.Errorf("suffix seed %q: suffixes are lowercase and need at least one URL", suffix)
+		}
+		for _, u := range urls {
+			if !strings.HasPrefix(u, "https://") || !strings.HasSuffix(u, "/") {
+				t.Errorf("suffix seed %q: %q must be https and end with /", suffix, u)
+			}
+		}
+	}
 }
 
 func TestBootstrapSeeds(t *testing.T) {
@@ -36,6 +46,8 @@ func TestBootstrapSeeds(t *testing.T) {
 		{"vaduz.li", "https://rdap.nic.li/"},                 // seed fills the gap
 		{"nic.ch", "https://iana.example/"},                  // IANA outranks the seed
 		{"example.com", "https://rdap.verisign.com/com/v1/"}, // business as usual
+		{"example.co.lu", "https://rdap.cctld.com/"},         // second-level suffix seed
+		{"example.wz.org", "https://rdap.cctld.com/"},        // second-level suffix seed
 	}
 	for _, tt := range tests {
 		urls, err := b.serversFor(context.Background(), tt.domain)

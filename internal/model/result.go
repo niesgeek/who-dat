@@ -27,6 +27,7 @@ type Result struct {
 	Nameservers   []Nameserver `json:"nameservers"`
 	DNSSEC        DNSSEC       `json:"dnssec"`
 	Dates         Dates        `json:"dates"`
+	Events        []Event      `json:"events"`
 	Contacts      Contacts     `json:"contacts"`
 	Meta          Meta         `json:"meta"`
 
@@ -75,6 +76,16 @@ type Dates struct {
 	Expires *time.Time `json:"expires"`
 }
 
+// Event is one lifecycle event from the upstream record, in chronological order.
+// Action keeps the registry's wording lower-cased ("registration", "last changed",
+// "expiration", "transfer", "last update of rdap database", ...). Dates derives
+// Created/Updated/Expires from these; keeping the full list means transfer,
+// re-registration and registry-database updates are no longer dropped.
+type Event struct {
+	Action string     `json:"action"`
+	Date   *time.Time `json:"date"`
+}
+
 // Contacts groups the four standard registration roles.
 type Contacts struct {
 	Registrant Contact `json:"registrant"`
@@ -109,6 +120,17 @@ type Meta struct {
 	Server    *string   `json:"server"`
 	FetchedAt time.Time `json:"fetchedAt"`
 	Cached    bool      `json:"cached"`
+	// DurationMs is the upstream round trip for this lookup in milliseconds
+	// (0 when the answer came from cache or no upstream call was made).
+	DurationMs int64 `json:"durationMs"`
+	// StatusCode is the upstream HTTP status for RDAP (0 for port-43 WHOIS,
+	// which has no HTTP status).
+	StatusCode int `json:"statusCode,omitempty"`
+	// Bytes is the size of the upstream payload in bytes.
+	Bytes int `json:"bytes,omitempty"`
+	// Conformance lists the RDAP conformance identifiers the registry claims
+	// (e.g. "rdap_level_0"); empty for WHOIS results.
+	Conformance []string `json:"conformance,omitempty"`
 }
 
 // New returns a Result with all list fields initialized to empty (non-nil) slices and
@@ -122,6 +144,7 @@ func New(query, domain, tld string) *Result {
 		Status:      []string{},
 		Nameservers: []Nameserver{},
 		DNSSEC:      DNSSEC{DSData: []DSData{}},
+		Events:      []Event{},
 		Contacts: Contacts{
 			Registrant: redacted,
 			Admin:      redacted,

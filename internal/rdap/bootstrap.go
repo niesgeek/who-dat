@@ -71,6 +71,25 @@ var seeds = map[string][]string{
 	"xn--p1ai":         {"https://cctld.ru/tci-ripn-rdap/"},               // Cyrillic .rf
 }
 
+// suffixSeeds covers second-level suffixes whose registry runs its own RDAP
+// service instead of the TLD's (e.g. co.lu under .lu). The IANA bootstrap only
+// lists TLDs, so these are matched on the longest suffix before the TLD lookup.
+var suffixSeeds = map[string][]string{
+	"cc.ag":  {"https://rdap.cctld.com/"},
+	"cc.je":  {"https://rdap.cctld.com/"},
+	"cc.sk":  {"https://rdap.cctld.com/"},
+	"cc.td":  {"https://rdap.cctld.com/"},
+	"co.fo":  {"https://rdap.cctld.com/"},
+	"co.ki":  {"https://rdap.cctld.com/"},
+	"co.lu":  {"https://rdap.cctld.com/"},
+	"co.sk":  {"https://rdap.cctld.com/"},
+	"co.td":  {"https://rdap.cctld.com/"},
+	"com.fo": {"https://rdap.cctld.com/"},
+	"edu.ax": {"https://rdap.cctld.com/"},
+	"wz.io":  {"https://rdap.cctld.com/"},
+	"wz.org": {"https://rdap.cctld.com/"},
+}
+
 // bootstrap resolves a TLD to its RDAP base URLs using the IANA registry, which it
 // fetches once and refreshes lazily.
 type bootstrap struct {
@@ -103,7 +122,11 @@ func (b *bootstrap) serversFor(ctx context.Context, asciiDomain string) ([]strin
 
 	labels := strings.Split(asciiDomain, ".")
 	for i := range labels {
-		if urls, ok := b.services[strings.Join(labels[i:], ".")]; ok {
+		suffix := strings.Join(labels[i:], ".")
+		if urls, ok := suffixSeeds[suffix]; ok {
+			return urls, nil
+		}
+		if urls, ok := b.services[suffix]; ok {
 			return urls, nil
 		}
 	}

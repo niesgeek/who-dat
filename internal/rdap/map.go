@@ -3,6 +3,7 @@ package rdap
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -13,15 +14,16 @@ import (
 
 // rdapDomain is the subset of an RFC 9083 domain object that we map.
 type rdapDomain struct {
-	Handle      laxString        `json:"handle"`
-	LDHName     string           `json:"ldhName"`
-	UnicodeName string           `json:"unicodeName"`
-	Port43      string           `json:"port43"`
-	Status      []string         `json:"status"`
-	Events      []rdapEvent      `json:"events"`
-	Entities    []rdapEntity     `json:"entities"`
-	Nameservers []rdapNameserver `json:"nameservers"`
-	SecureDNS   *rdapSecureDNS   `json:"secureDNS"`
+	Handle          laxString        `json:"handle"`
+	LDHName         string           `json:"ldhName"`
+	UnicodeName     string           `json:"unicodeName"`
+	Port43          string           `json:"port43"`
+	Status          []string         `json:"status"`
+	Events          []rdapEvent      `json:"events"`
+	Entities        []rdapEntity     `json:"entities"`
+	Nameservers     []rdapNameserver `json:"nameservers"`
+	SecureDNS       *rdapSecureDNS   `json:"secureDNS"`
+	RDAPConformance []string         `json:"rdapConformance"`
 }
 
 type rdapEvent struct {
@@ -103,7 +105,7 @@ func mapDomain(n domain.Name, server string, raw []byte) (*model.Result, error) 
 	r.IsRegistered = true
 	r.ID = model.Str(string(d.Handle))
 	r.Status = model.NormalizeStatuses(d.Status)
-	r.Meta = model.Meta{Source: model.SourceRDAP, Server: model.Str(server), FetchedAt: time.Now().UTC()}
+	r.Meta = model.Meta{Source: model.SourceRDAP, Server: model.Str(server), FetchedAt: time.Now().UTC(), Conformance: d.RDAPConformance}
 	r.Raw = raw
 	r.RawContentType = contentType
 
@@ -138,6 +140,29 @@ func parseEventDate(s string) time.Time {
 }
 
 func mapEvents(r *model.Result, events []rdapEvent) {
+	// Keep the full event list, chronological and de-duplicated, so the
+	// frontend can render a timeline instead of only three dates.
+	seen := make(map[string]struct{}, len(events))
+	for _, e := range events {
+		t := parseEventDate(e.Date)
+		if t.IsZero() {
+			continue
+		}
+		action := strings.ToLower(strings.TrimSpace(e.Action))
+		if action == "" {
+			continue
+		}
+		key := action + "|" + t.UTC().Format(time.RFC3339)
+		if _, dup := seen[key]; dup {
+			continue
+		}
+		seen[key] = struct{}{}
+		r.Events = append(r.Events, model.Event{Action: action, Date: model.Time(t)})
+	}
+	sort.Slice(r.Events, func(i, j int) bool {
+		return r.Events[i].Date.Before(*r.Events[j].Date)
+	})
+
 	for _, e := range events {
 		t := parseEventDate(e.Date)
 		if t.IsZero() {

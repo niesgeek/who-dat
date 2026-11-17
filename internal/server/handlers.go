@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -76,6 +77,22 @@ func (s *server) handleMulti(w http.ResponseWriter, r *http.Request) {
 		q = strings.TrimSpace(q)
 		n, err := domain.Parse(q)
 		if err != nil {
+			var pe *domain.PlatformNamespaceError
+			if errors.As(err, &pe) {
+				ns := pe.Namespace
+				results = append(results, errorBody{Error: errorDetail{
+					Code:    codePlatformNS,
+					Message: "platform-run namespace, not a registry record",
+					Query:   q,
+					Platform: &platformInfo{
+						Name:      ns.Name,
+						URL:       ns.URL,
+						Suffix:    ns.Suffix,
+						HasLookup: ns.HasLookup,
+					},
+				}})
+				continue
+			}
 			results = append(results, multiError(q, "could not parse a registrable domain"))
 			continue
 		}
