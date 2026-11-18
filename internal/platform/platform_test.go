@@ -11,6 +11,7 @@ import (
 	"github.com/lissy93/who-dat/internal/dnsq"
 	"github.com/lissy93/who-dat/internal/domain"
 	"github.com/lissy93/who-dat/internal/model"
+	"github.com/lissy93/who-dat/internal/srcerr"
 )
 
 // live fixtures, shapes verified 2026-11-18 against the platforms' own APIs
@@ -281,6 +282,145 @@ func TestSeusDirectory(t *testing.T) {
 	}
 }
 
+func TestYunamoFound(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasSuffix(r.URL.Path, "/example.loc.cc") {
+			t.Errorf("path = %q", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(yunamoFound))
+	}))
+	defer ts.Close()
+
+	c := NewYunamoClient(ts.Client())
+	c.endpoint = ts.URL + "/"
+	n, _ := domain.Parse("example.loc.cc")
+	res, err := c.Lookup(context.Background(), n, "loc.cc")
+	if err != nil {
+		t.Fatalf("Lookup: %v", err)
+	}
+	if !res.IsRegistered || res.Meta.Source != model.SourcePlatform {
+		t.Errorf("result = %+v", res)
+	}
+	if res.Platform == nil || res.Platform.Name != "Yunamo" || res.Platform.Suffix != "loc.cc" {
+		t.Errorf("platform = %+v", res.Platform)
+	}
+	if res.Dates.Created == nil || res.Dates.Created.Format("2006-01-02") != "2026-10-20" {
+		t.Errorf("created = %v", res.Dates.Created)
+	}
+	// A 100-year term: the expiry is the story here, not a typo.
+	if res.Dates.Expires == nil || res.Dates.Expires.Format("2006-01-02") != "2126-10-20" {
+		t.Errorf("expires = %v", res.Dates.Expires)
+	}
+	if len(res.Status) != 1 || res.Status[0] != "active" {
+		t.Errorf("status = %v", res.Status)
+	}
+	if len(res.Nameservers) != 2 || res.Nameservers[0].Name != "dns1.serv00.com" {
+		t.Errorf("nameservers = %+v", res.Nameservers)
+	}
+	if res.Registrar.Name == nil || *res.Registrar.Name != "Yunamo" {
+		t.Errorf("registrar = %+v", res.Registrar)
+	}
+	if len(res.Events) != 2 {
+		t.Errorf("events = %d, want registration + expiration", len(res.Events))
+	}
+	// Raw is the platform reply verbatim, scan block included.
+	if !strings.Contains(string(res.Raw), `"overall_health":"healthy"`) {
+		t.Errorf("raw payload missing scan block: %s", res.Raw)
+	}
+	if res.RawContentType != "application/json" {
+		t.Errorf("raw content type = %q", res.RawContentType)
+	}
+}
+
+func TestYunamoNotFoundAndRateLimited(t *testing.T) {
+	nfTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"error":"Domain not found"}`))
+	}))
+	defer nfTS.Close()
+	c := NewYunamoClient(nfTS.Client())
+	c.endpoint = nfTS.URL + "/"
+	n, _ := domain.Parse("zzzqqq12345notexist.loc.cc")
+	_, err := c.Lookup(context.Background(), n, "loc.cc")
+	var nf *NotFound
+	if !errors.As(err, &nf) || nf.Provider != "Yunamo" || nf.Suffix != "loc.cc" {
+		t.Fatalf("Lookup err = %v, want Yunamo *NotFound", err)
+	}
+
+	rlTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusTooManyRequests)
+	}))
+	defer rlTS.Close()
+	c2 := NewYunamoClient(rlTS.Client())
+	c2.endpoint = rlTS.URL + "/"
+	_, err = c2.Lookup(context.Background(), n, "loc.cc")
+	var rl *srcerr.RateLimited
+	if !errors.As(err, &rl) {
+		t.Fatalf("Lookup err = %v, want *RateLimited", err)
+	}
+}
+
+func TestYunamoDirectory(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Write([]byte(`{"root_domains":[{"domain":"loc.cc","is_active":true,"registration_count":13536},{"domain":"vvpp.cc","is_active":true,"registration_count":1},{"domain":"dead.example","is_active":false}]}`))
+	}))
+	defer ts.Close()
+
+	d := NewYunamoDirectory(ts.Client())
+	d.endpoint = ts.URL
+	if suf, ok := d.SuffixFor(context.Background(), "example.loc.cc"); !ok || suf != "loc.cc" {
+		t.Errorf("SuffixFor(example.loc.cc) = %q, %v", suf, ok)
+	}
+	if suf, ok := d.SuffixFor(context.Background(), "x.vvpp.cc"); !ok || suf != "vvpp.cc" {
+		t.Errorf("SuffixFor(x.vvpp.cc) = %q, %v", suf, ok)
+	}
+	if _, ok := d.SuffixFor(context.Background(), "x.dead.example"); ok {
+		t.Errorf("SuffixFor(x.dead.example) matched an inactive root domain")
+	}
+	if _, ok := d.SuffixFor(context.Background(), "loc.cc"); ok {
+		t.Errorf("SuffixFor(loc.cc) matched the parent itself")
+	}
+}
+
+func TestRouterYunamo(t *testing.T) {
+	yuTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Write([]byte(yunamoFound))
+	}))
+	defer yuTS.Close()
+	dirTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Write([]byte(`{"root_domains":[{"domain":"loc.cc","is_active":true},{"domain":"vvpp.cc","is_active":true}]}`))
+	}))
+	defer dirTS.Close()
+
+	yu := NewYunamoClient(yuTS.Client())
+	yu.endpoint = yuTS.URL + "/"
+	ydir := NewYunamoDirectory(dirTS.Client())
+	ydir.endpoint = dirTS.URL
+	r := NewRouter(nil, nil, nil, yu, ydir, fakeQuerier{})
+
+	n, _ := domain.Parse("example.loc.cc")
+	res, err := r.Lookup(context.Background(), n)
+	if err != nil || res == nil || res.Platform == nil || res.Platform.Name != "Yunamo" {
+		t.Fatalf("Lookup(example.loc.cc) = %+v, %v", res, err)
+	}
+	n2, _ := domain.Parse("x.vvpp.cc")
+	res, err = r.Lookup(context.Background(), n2)
+	if err != nil || res == nil {
+		t.Fatalf("Lookup(x.vvpp.cc) = %+v, %v", res, err)
+	}
+	// A plain registry name passes through untouched.
+	n3, _ := domain.Parse("example.com")
+	res, err = r.Lookup(context.Background(), n3)
+	if err != nil || res != nil {
+		t.Fatalf("Lookup(example.com) = %+v, %v, want passthrough", res, err)
+	}
+}
+
+// yunamoFound is the verbatim reply for example.loc.cc (public platform data,
+// no personal information), captured 2026-11-18.
+const yunamoFound = `{"days_until_deletion":null,"days_until_suspension":null,"downtime_paused_at":null,"expires_at":"2126-10-20T12:11:52.583948Z","first_failed_at":null,"full_domain":"example.loc.cc","nameservers":["dns1.serv00.com","dns2.serv00.com"],"registered_at":"2026-10-20T12:11:52.583948Z","scan":{"dns_status":"resolved","http_status":"online","last_scanned_at":"2026-11-18T01:03:45.804632Z","overall_health":"healthy","safe_browsing_status":"safe","ssl_status":"valid","successful_scans":281,"total_scans":436,"uptime_percentage":64.44954128440367,"virustotal_status":"clean"},"status":"active","suspend_reason":null,"suspended_at":null}`
+
 type fakeQuerier struct {
 	resp *dnsq.Response
 	err  error
@@ -300,7 +440,7 @@ func TestRouterDNSLive(t *testing.T) {
 	furry.endpoint = furryTS.URL + "/"
 
 	// NS answers exist: the miss is live in DNS.
-	live := NewRouter(furry, nil, nil, fakeQuerier{resp: &dnsq.Response{Rcode: "NOERROR", Answer: []dnsq.RR{{Name: "zzz.owo.name"}}}})
+	live := NewRouter(furry, nil, nil, nil, nil, fakeQuerier{resp: &dnsq.Response{Rcode: "NOERROR", Answer: []dnsq.RR{{Name: "zzz.owo.name"}}}})
 	n, _ := domain.Parse("zzz.owo.name")
 	_, err := live.Lookup(context.Background(), n)
 	var nf *NotFound
@@ -309,21 +449,21 @@ func TestRouterDNSLive(t *testing.T) {
 	}
 
 	// No answers and NXDOMAIN: provably not live.
-	dead := NewRouter(furry, nil, nil, fakeQuerier{resp: &dnsq.Response{Rcode: "NXDOMAIN"}})
+	dead := NewRouter(furry, nil, nil, nil, nil, fakeQuerier{resp: &dnsq.Response{Rcode: "NXDOMAIN"}})
 	_, err = dead.Lookup(context.Background(), n)
 	if !errors.As(err, &nf) || nf.DNSLive == nil || *nf.DNSLive {
 		t.Fatalf("Lookup err = %v, want NotFound with DNSLive=false", err)
 	}
 
 	// DNS error: unknown, not false.
-	unknown := NewRouter(furry, nil, nil, fakeQuerier{err: errors.New("boom")})
+	unknown := NewRouter(furry, nil, nil, nil, nil, fakeQuerier{err: errors.New("boom")})
 	_, err = unknown.Lookup(context.Background(), n)
 	if !errors.As(err, &nf) || nf.DNSLive != nil {
 		t.Fatalf("Lookup err = %v, want NotFound with DNSLive=nil", err)
 	}
 
 	// A plain registry name passes through untouched.
-	plain := NewRouter(furry, nil, nil, fakeQuerier{})
+	plain := NewRouter(furry, nil, nil, nil, nil, fakeQuerier{})
 	n2, _ := domain.Parse("example.com")
 	res, err := plain.Lookup(context.Background(), n2)
 	if err != nil || res != nil {

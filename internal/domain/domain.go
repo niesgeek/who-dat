@@ -39,17 +39,13 @@ type PlatformNamespace struct {
 // interface to their operator. Names under these suffixes are refused by
 // Parse with a PlatformNamespaceError: the record lives with the platform,
 // not the registry, and there is no API to ask. Platforms that do publish a
-// query API (FurryBox, SEUS) are not listed here — they are queried by the
-// platform package instead of being refused.
+// query API (FurryBox, SEUS, Yunamo) are not listed here — they are queried
+// by the platform package instead of being refused.
 var platformNamespaces = map[string]PlatformNamespace{
 	"cc.cd":   {Suffix: "cc.cd", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "cc.cd", HasLookup: false},
 	"bot.cd":  {Suffix: "bot.cd", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "bot.cd", HasLookup: false},
 	"us.ci":   {Suffix: "us.ci", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "us.ci", HasLookup: false},
 	"de5.net": {Suffix: "de5.net", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "de5.net", HasLookup: false},
-	// Yunamo publishes a query API, but its endpoint is not public (no CORS,
-	// no documented route); until it is found, names under loc.cc are refused
-	// here with a pointer to the platform instead of being queried.
-	"loc.cc": {Suffix: "loc.cc", Name: "Yunamo", URL: "https://yunamo.com/", Parent: "loc.cc", HasLookup: true},
 }
 
 // furryBoxSuffixes are the namespaces FurryBox carved out of its own domains.
@@ -88,9 +84,22 @@ var seusSuffixSnapshot = map[string]bool{
 	"fs.kg": true, "is-a.si": true, "us.mw": true, "bg5.net": true, "nastu.net": true,
 }
 
+// yunamoSuffixSnapshot is the Yunamo root-domain directory as last seen
+// (live list at https://yunamo.com/api/public/root-domains). The platform
+// package fetches that list live for routing; this snapshot only tells Parse
+// where the registrable boundary sits, so a Yunamo name keeps its label
+// instead of collapsing to the parent in the PSL. Refresh it when the
+// directory changes: a suffix missing here parses as its parent and never
+// reaches the platform lookup, while a suffix that left Yunamo still parses
+// as a platform name and falls through to RDAP for the parent TLD.
+var yunamoSuffixSnapshot = map[string]bool{
+	"loc.cc": true, "vvpp.cc": true,
+}
+
 // queryablePlatformSuffixFor returns the platform namespace a host sits in
-// when that platform publishes a query API (FurryBox, SEUS snapshot). The
-// parent domain itself does not match; only names under it do.
+// when that platform publishes a query API (FurryBox, SEUS and Yunamo
+// snapshots). The parent domain itself does not match; only names under it
+// do.
 func queryablePlatformSuffixFor(host string) (string, bool) {
 	if suf, ok := FurryBoxSuffixFor(host); ok {
 		return suf, true
@@ -98,7 +107,7 @@ func queryablePlatformSuffixFor(host string) (string, bool) {
 	host = strings.ToLower(strings.TrimSuffix(strings.TrimSpace(host), "."))
 	labels := strings.Split(host, ".")
 	for i := 1; i < len(labels); i++ {
-		if suf := strings.Join(labels[i:], "."); seusSuffixSnapshot[suf] {
+		if suf := strings.Join(labels[i:], "."); seusSuffixSnapshot[suf] || yunamoSuffixSnapshot[suf] {
 			return suf, true
 		}
 	}

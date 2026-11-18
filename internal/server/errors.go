@@ -130,6 +130,8 @@ func platformServer(provider string) string {
 		return "whois.furry.box"
 	case "SEUS":
 		return "s.eus"
+	case "Yunamo":
+		return "yunamo.com"
 	default:
 		return ""
 	}

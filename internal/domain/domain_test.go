@@ -78,7 +78,6 @@ func TestParsePlatformNamespace(t *testing.T) {
 		{"foo.cc.cd", "DNSHE"},
 		{"a.b.us.ci", "DNSHE"},
 		{"x.de5.net", "DNSHE"},
-		{"hello.loc.cc", "Yunamo"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.in, func(t *testing.T) {
@@ -99,7 +98,7 @@ func TestParsePlatformNamespace(t *testing.T) {
 
 func TestParsePlatformParentIsNormal(t *testing.T) {
 	// The parent domain itself is a registry record, not a platform name.
-	for _, in := range []string{"cc.cd", "owo.name", "de5.net"} {
+	for _, in := range []string{"cc.cd", "owo.name", "de5.net", "loc.cc", "vvpp.cc"} {
 		if _, err := Parse(in); err != nil {
 			var pe *PlatformNamespaceError
 			if errors.As(err, &pe) {
@@ -123,6 +122,8 @@ func TestParseQueryablePlatformParses(t *testing.T) {
 		{"deep.a.owo.name", "a.owo.name", "owo.name"},
 		{"domain.fs.kg", "domain.fs.kg", "fs.kg"},
 		{"a.bg5.net", "a.bg5.net", "bg5.net"},
+		{"example.loc.cc", "example.loc.cc", "loc.cc"},
+		{"deep.a.vvpp.cc", "a.vvpp.cc", "vvpp.cc"},
 	}
 	for _, tt := range tests {
 		n, err := Parse(tt.in)

@@ -52,12 +52,14 @@ func Build(cfg *config.Config) http.Handler {
 	if cfg.EnableCache {
 		c = cache.New(cfg.CacheTTL)
 	}
-	// Platform lookups (FurryBox, SEUS) run before RDAP: those names are not
-	// registry records.
+	// Platform lookups (FurryBox, SEUS, Yunamo) run before RDAP: those names
+	// are not registry records.
 	plat := platform.NewRouter(
 		platform.NewFurryClient(httpClient),
 		platform.NewSeusClient(httpClient),
 		platform.NewSeusDirectory(httpClient),
+		platform.NewYunamoClient(httpClient),
+		platform.NewYunamoDirectory(httpClient),
 		dnsq.New(cfg.DNSTimeout),
 	)
 	svc := lookup.NewService(rdap.NewClient(httpClient), whois.NewClient(), c, plat)

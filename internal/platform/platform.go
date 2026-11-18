@@ -1,8 +1,9 @@
 // Package platform queries platforms that run their own namespaces and publish
-// a query API for them (FurryBox, SEUS). These names are not registry records,
-// so RDAP/WHOIS must never answer for them; the platform's own API is the only
-// authority. A platform that publishes no query API is not handled here —
-// domain.PlatformNamespace refuses those names with a pointer to the platform.
+// a query API for them (FurryBox, SEUS, Yunamo). These names are not registry
+// records, so RDAP/WHOIS must never answer for them; the platform's own API
+// is the only authority. A platform that publishes no query API is not
+// handled here — domain.PlatformNamespace refuses those names with a pointer
+// to the platform.
 package platform
 
 import (
@@ -44,16 +45,18 @@ func FurryBoxSuffix(host string) (string, bool) {
 // Lookup returns (nil, nil) when no platform owns the name and the caller
 // should continue to RDAP/WHOIS.
 type Router struct {
-	Furry *FurryClient
-	Seus  *SeusClient
-	Dir   *SeusDirectory
-	DNS   dnsq.Querier // nil disables the DNS-live check on platform misses
+	Furry  *FurryClient
+	Seus   *SeusClient
+	Dir    *SeusDirectory
+	Yunamo *YunamoClient
+	YDir   *YunamoDirectory
+	DNS    dnsq.Querier // nil disables the DNS-live check on platform misses
 }
 
 // NewRouter wires the platform clients. Any of them may be nil to disable
 // that platform (its names then fall through to the registry path).
-func NewRouter(furry *FurryClient, seus *SeusClient, dir *SeusDirectory, dns dnsq.Querier) *Router {
-	return &Router{Furry: furry, Seus: seus, Dir: dir, DNS: dns}
+func NewRouter(furry *FurryClient, seus *SeusClient, dir *SeusDirectory, yunamo *YunamoClient, ydir *YunamoDirectory, dns dnsq.Querier) *Router {
+	return &Router{Furry: furry, Seus: seus, Dir: dir, Yunamo: yunamo, YDir: ydir, DNS: dns}
 }
 
 // Lookup answers from the owning platform, or (nil, nil) to continue.
@@ -68,6 +71,12 @@ func (r *Router) Lookup(ctx context.Context, n domain.Name) (*model.Result, erro
 	if r.Seus != nil && r.Dir != nil {
 		if suf, ok := r.Dir.SuffixFor(ctx, n.ASCII); ok {
 			res, err := r.Seus.Lookup(ctx, n, suf)
+			return r.finish(ctx, res, err, n)
+		}
+	}
+	if r.Yunamo != nil && r.YDir != nil {
+		if suf, ok := r.YDir.SuffixFor(ctx, n.ASCII); ok {
+			res, err := r.Yunamo.Lookup(ctx, n, suf)
 			return r.finish(ctx, res, err, n)
 		}
 	}
