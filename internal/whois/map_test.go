@@ -17,7 +17,8 @@ var update = flag.Bool("update", false, "update golden files")
 
 // goldenCases maps a frozen WHOIS fixture to the domain it represents.
 var goldenCases = map[string]domain.Name{
-	"google.it.txt": {ASCII: "google.it", Unicode: "google.it", TLD: "it"},
+	"google.it.txt":   {ASCII: "google.it", Unicode: "google.it", TLD: "it"},
+	"yuedu.pp.ua.txt": {ASCII: "yuedu.pp.ua", Unicode: "yuedu.pp.ua", TLD: "pp.ua"},
 }
 
 func TestMapWhoisGolden(t *testing.T) {

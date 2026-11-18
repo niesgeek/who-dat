@@ -189,7 +189,7 @@
       "source.platformNoLookup": "这个平台没有公开的查询接口",
       "source.platformLabel": "平台 API",
       "source.protoPlatform": "HTTPS · 平台 API",
-      "source.finePlatform": "平台 API 记录：字段照平台原文转写，未做二次判定；注册局不登记这一层。",
+      "source.finePlatform": "经平台官方查询接口查询，字段照原文展示，未做二次判定；注册局不登记这一层。",
       "source.platformNotFound": "这个名字在平台的库里查不到，通常意味着在平台上还可以注册——真正注册前请在平台页面再确认一次。",
       "source.platformNotFoundDns": "这个名字在平台的库里查不到，可它的 NS 已经有应答——多半是在别处委派或在用，不能当成空号。",
       "source.platformNotFoundNoDns": "这个名字在平台的库里查不到，DNS 里也没有应答，通常意味着在平台上还可以注册。",
@@ -224,6 +224,9 @@
       "price.uncovered": "未收录",
       "price.fail": "价格数据没有取到（这不影响上面的注册局记录）。",
       "price.skip": "平台命名空间的后缀没有公开比价数据。",
+      "price.free": "免费",
+      "price.freeBody": "{platform} 免费二级域名",
+      "price.freeFine": "平台免费二级域名，不收注册费；注册规则与名额以平台页面为准。",
       "price.empty": "这家比价站还没有收录 .{tld} 的报价 —— 它收了上百家注册商、几千个后缀，但确实不是全部。",
       "price.fine": "价格来自哪煮米收录的注册商公开挂牌价；人民币由上游按参考汇率折算，券后价与标准价都按上游记录。最终以注册商结算页为准。",
       "price.loading": "查比价中…",
@@ -461,7 +464,7 @@
       "source.platformNoLookup": "This platform publishes no public lookup",
       "source.platformLabel": "Platform API",
       "source.protoPlatform": "HTTPS · Platform API",
-      "source.finePlatform": "Platform API record: fields transcribed from the platform's own payload, no second-guessing; the registry does not record this layer.",
+      "source.finePlatform": "Queried through the platform's own lookup API; fields are shown verbatim from its reply, with no second-guessing; the registry does not record this layer.",
       "source.platformNotFound": "This name is absent from the platform's database, which usually means it is still available there. Confirm on the platform page before you register.",
       "source.platformNotFoundDns": "This name is absent from the platform's database, yet its NS already answers — it is likely delegated elsewhere or in use, so do not treat it as free.",
       "source.platformNotFoundNoDns": "This name is absent from the platform's database and has no DNS answer, which usually means it is still available there.",
@@ -496,6 +499,9 @@
       "price.uncovered": "Not covered",
       "price.fail": "Price data did not come back (the registry record above is unaffected).",
       "price.skip": "Platform-namespace suffixes have no public price comparison.",
+      "price.free": "Free",
+      "price.freeBody": "{platform} free second-level domain",
+      "price.freeFine": "A free second-level domain on this platform, no registration fee; rules and availability follow the platform's own page.",
       "price.empty": "This comparison site does not list prices for .{tld} yet — it covers over a hundred registrars and thousands of suffixes, but not all of them.",
       "price.fine": "Prices are public registrar lists collected by nazhumi.com; CNY figures use its reference conversion, and coupon and list prices are as recorded upstream. The registrar's checkout page is final.",
       "price.loading": "Checking prices…",
@@ -1044,7 +1050,10 @@
       if (fetched) metaBits.push(fetched);
     }
     var meta = metaBits.length ? el("p", { class: "meta-line", text: metaBits.join(" · ") }) : null;
-    host.replaceChildren(top, kv, alt, meta);
+    // Same trap as paintNS: replaceChildren stringifies a null child.
+    var recKids = [top, kv, alt];
+    if (meta) recKids.push(meta);
+    host.replaceChildren.apply(host, recKids);
 
     if (state.showJson) {
       raw.hidden = false;
@@ -1107,7 +1116,12 @@
         return el("div", { class: "ds", title: digest, text: "DS " + (item.keyTag || "") + " · alg " + (item.algorithm || "") + " · " + short });
       }));
     }
-    host.replaceChildren(score, facts, list, dsBox);
+    // replaceChildren stringifies a null child, so a missing DS box would
+    // print a literal "null" at the bottom of the card. Only pass it when
+    // there is one.
+    var nsKids = [score, facts, list];
+    if (dsBox) nsKids.push(dsBox);
+    host.replaceChildren.apply(host, nsKids);
   }
 
   function contactCard(role, c) {
@@ -1192,6 +1206,7 @@
       var p = err.platform || {};
       badge.textContent = (p.name || "PLATFORM").toUpperCase();
       badge.className = "badge badge-coral";
+      if (fine) fine.textContent = t("source.finePlatform");
       var body = err.dns === true ? t("source.platformNotFoundDns")
         : err.dns === false ? t("source.platformNotFoundNoDns")
         : t("source.platformNotFound");
@@ -1444,9 +1459,20 @@
       return;
     }
     if (p.skipped) {
-      badge.textContent = "—";
-      badge.className = "badge badge-grey";
-      host.replaceChildren(el("div", { class: "empty" }, [el("p", { text: t("price.skip") })]));
+      // Platform namespaces are free second-level domains on their platform,
+      // so the price card names the platform instead of showing a comparison.
+      if (p.platform) {
+        badge.textContent = t("price.free");
+        badge.className = "badge badge-lime";
+        host.replaceChildren(el("div", { class: "empty" }, [
+          el("strong", { text: t("price.freeBody").replace("{platform}", p.platform) }),
+          el("p", { text: t("price.freeFine") })
+        ]));
+      } else {
+        badge.textContent = "—";
+        badge.className = "badge badge-grey";
+        host.replaceChildren(el("div", { class: "empty" }, [el("p", { text: t("price.skip") })]));
+      }
       return;
     }
     if (p.error || !p.data) {
@@ -1774,9 +1800,9 @@
       state.rawText = "";
       state.rawLoading = false;
       remember(data.domain || q);
-      // Platform namespaces have no public price comparison; the record above
-      // is the whole answer.
-      if (data.platform) state.price = { skipped: true };
+      // Platform namespaces are free second-level domains on their platform;
+      // the record above is the whole answer, and the price card says so.
+      if (data.platform) state.price = { skipped: true, platform: (data.platform.name || "") };
       else loadPrice(data);
       loadRaw(data);
     }, function (err) {

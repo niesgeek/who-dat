@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	whoisparser "github.com/likexian/whois-parser"
@@ -49,7 +50,85 @@ func mapWhois(n domain.Name, raw string) (*model.Result, error) {
 	r.Contacts.Admin = contact(info.Administrative)
 	r.Contacts.Tech = contact(info.Technical)
 	r.Contacts.Billing = contact(info.Billing)
+	// The parser's date layouts do not cover every registry's format (see
+	// fillMissingDates): when it leaves a date empty, read the line ourselves
+	// instead of showing a blank, then rebuild the timeline from the filled
+	// dates.
+	fillMissingDates(r, raw)
+	r.Events = synthesizeEvents(r.Dates)
 	return r, nil
+}
+
+// fallbackDateLabels maps each date role to the WHOIS labels a registry may
+// use for it, longest label first so "Created On:" wins over "Created:".
+var fallbackDateLabels = []struct {
+	role   string
+	labels []string
+}{
+	{"created", []string{"Created On:", "Creation Date:", "Created:"}},
+	{"updated", []string{"Last Updated On:", "Updated Date:", "Last Updated:", "Updated:"}},
+	{"expires", []string{"Expiration Date:", "Expiry Date:", "Expire Date:", "Expires:"}},
+}
+
+// fallbackDateLayouts are tried for a fallback date value. The parser already
+// handles the common shapes; this list only adds the ones it misses, notably
+// "10-Oct-2022 06:55:49 UTC" (whois.pp.ua) whose trailing zone name matches
+// none of its layouts. time.Parse treats a layout's MST slot as a zone
+// abbreviation, so "UTC" lands in UTC.
+var fallbackDateLayouts = []string{
+	"02-Jan-2006 15:04:05 MST",
+	"02 Jan 2006 15:04:05 MST",
+	"02-Jan-2006 15:04:05",
+	"02-Jan-2006",
+	"2006-01-02 15:04:05 MST",
+	"2006-01-02 15:04:05",
+	"2006-01-02",
+	time.RFC3339,
+}
+
+// fillMissingDates fills any date the parser left empty by scanning the raw
+// text for that role's labels. It never overwrites a date the parser did find.
+func fillMissingDates(r *model.Result, raw string) {
+	missing := map[string]bool{
+		"created": r.Dates.Created == nil,
+		"updated": r.Dates.Updated == nil,
+		"expires": r.Dates.Expires == nil,
+	}
+	if !missing["created"] && !missing["updated"] && !missing["expires"] {
+		return
+	}
+	for _, line := range strings.Split(raw, "\n") {
+		line = strings.TrimSpace(line)
+		for _, entry := range fallbackDateLabels {
+			if !missing[entry.role] {
+				continue
+			}
+			for _, label := range entry.labels {
+				if !strings.HasPrefix(line, label) {
+					continue
+				}
+				value := strings.TrimSpace(strings.TrimPrefix(line, label))
+				if value == "" {
+					break
+				}
+				for _, layout := range fallbackDateLayouts {
+					if t, err := time.Parse(layout, value); err == nil {
+						switch entry.role {
+						case "created":
+							r.Dates.Created = model.Time(t.UTC())
+						case "updated":
+							r.Dates.Updated = model.Time(t.UTC())
+						case "expires":
+							r.Dates.Expires = model.Time(t.UTC())
+						}
+						missing[entry.role] = false
+						break
+					}
+				}
+				break
+			}
+		}
+	}
 }
 
 func mapDomain(r *model.Result, d *whoisparser.Domain) {

@@ -1,0 +1,121 @@
+{
+  "query": "yuedu.pp.ua",
+  "domain": "yuedu.pp.ua",
+  "domainUnicode": null,
+  "id": "1070071_PPUA-DRS",
+  "tld": "pp.ua",
+  "isRegistered": true,
+  "registrar": {
+    "name": "NIC.UA LLC (nic-mnt-cunic)",
+    "ianaId": null,
+    "url": null,
+    "whoisServer": null,
+    "abuseEmail": null,
+    "abusePhone": null,
+    "reseller": null
+  },
+  "status": [
+    "serverDeleteProhibited"
+  ],
+  "nameservers": [
+    {
+      "name": "jack.ns.cloudflare.com",
+      "ipv4": [],
+      "ipv6": []
+    },
+    {
+      "name": "teagan.ns.cloudflare.com",
+      "ipv4": [],
+      "ipv6": []
+    }
+  ],
+  "dnssec": {
+    "signed": false,
+    "dsData": []
+  },
+  "dates": {
+    "created": "2022-10-10T06:55:49Z",
+    "updated": "2026-09-10T05:12:23Z",
+    "expires": "2027-10-10T06:55:49Z"
+  },
+  "events": [
+    {
+      "action": "registration",
+      "date": "2022-10-10T06:55:49Z"
+    },
+    {
+      "action": "last changed",
+      "date": "2026-09-10T05:12:23Z"
+    },
+    {
+      "action": "expiration",
+      "date": "2027-10-10T06:55:49Z"
+    }
+  ],
+  "contacts": {
+    "registrant": {
+      "name": null,
+      "organization": null,
+      "email": null,
+      "phone": null,
+      "address": {
+        "street": null,
+        "city": null,
+        "state": null,
+        "postalCode": null,
+        "country": null
+      },
+      "redacted": true
+    },
+    "admin": {
+      "name": null,
+      "organization": null,
+      "email": null,
+      "phone": null,
+      "address": {
+        "street": null,
+        "city": null,
+        "state": null,
+        "postalCode": null,
+        "country": null
+      },
+      "redacted": true
+    },
+    "tech": {
+      "name": null,
+      "organization": null,
+      "email": null,
+      "phone": null,
+      "address": {
+        "street": null,
+        "city": null,
+        "state": null,
+        "postalCode": null,
+        "country": null
+      },
+      "redacted": true
+    },
+    "billing": {
+      "name": null,
+      "organization": null,
+      "email": null,
+      "phone": null,
+      "address": {
+        "street": null,
+        "city": null,
+        "state": null,
+        "postalCode": null,
+        "country": null
+      },
+      "redacted": true
+    }
+  },
+  "meta": {
+    "source": "whois",
+    "server": null,
+    "fetchedAt": "0001-01-01T00:00:00Z",
+    "cached": false,
+    "durationMs": 0,
+    "bytes": 544
+  }
+}

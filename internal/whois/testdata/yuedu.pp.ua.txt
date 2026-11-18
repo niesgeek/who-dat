@@ -1,0 +1,13 @@
+% whois.pp.ua reply for yuedu.pp.ua, trimmed to the fields this test covers:
+% the contact blocks (name, address, phone, email) are omitted on purpose —
+% they carry personal data and are not needed to check date parsing.
+
+Domain ID:1070071_PPUA-DRS
+Domain Name:YUEDU.PP.UA
+Created On:10-Oct-2022 06:55:49 UTC
+Last Updated On:10-Sep-2026 05:12:23 UTC
+Expiration Date:10-Oct-2027 06:55:49 UTC
+Sponsoring Registrar:NIC.UA LLC (nic-mnt-cunic)
+Status:serverDeleteProhibited
+Name Server:JACK.NS.CLOUDFLARE.COM
+Name Server:TEAGAN.NS.CLOUDFLARE.COM
