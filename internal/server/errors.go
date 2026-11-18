@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/lissy93/who-dat/internal/domain"
+	"github.com/lissy93/who-dat/internal/platform"
 	"github.com/lissy93/who-dat/internal/srcerr"
 )
 
@@ -16,6 +17,7 @@ const (
 	codeInvalidDomain    = "INVALID_DOMAIN"
 	codeUnsupportedTLD   = "UNSUPPORTED_TLD"
 	codePlatformNS       = "PLATFORM_NAMESPACE"
+	codePlatformNotFound = "PLATFORM_NOT_FOUND"
 	codeRateLimited      = "RATE_LIMITED"
 	codeMethodNotAllowed = "METHOD_NOT_ALLOWED"
 	codeUpstreamError    = "UPSTREAM_ERROR"
@@ -45,6 +47,10 @@ type errorDetail struct {
 	Server   string        `json:"server,omitempty"` // upstream server queried, when known
 	Detail   string        `json:"detail,omitempty"` // underlying error chain, for diagnostics
 	Platform *platformInfo `json:"platform,omitempty"`
+	// DNS is tri-state for PLATFORM_NOT_FOUND: true when the name already
+	// answers in DNS (delegated elsewhere), false when it provably does not,
+	// absent when the check was inconclusive.
+	DNS *bool `json:"dns,omitempty"`
 }
 
 // writeError sends the standard error envelope with the given status.
@@ -87,6 +93,16 @@ func lookupError(err error, query string) (status int, retryAfter time.Duration,
 		d.Source, d.Server = se.Source, se.Server
 	}
 
+	var nf *platform.NotFound
+	if errors.As(err, &nf) {
+		d.Code, d.Message = codePlatformNotFound, "no record on this platform"
+		d.Source = "platform"
+		d.Server = platformServer(nf.Provider)
+		d.DNS = nf.DNSLive
+		d.Platform = &platformInfo{Name: nf.Provider, URL: nf.ProviderURL, Suffix: nf.Suffix, HasLookup: true}
+		return http.StatusNotFound, 0, d
+	}
+
 	var rl *srcerr.RateLimited
 	switch {
 	case errors.As(err, &rl):
@@ -104,6 +120,18 @@ func lookupError(err error, query string) (status int, retryAfter time.Duration,
 	default:
 		d.Code, d.Message, d.Detail = codeInternal, "internal error", "" // internals stay internal
 		return http.StatusInternalServerError, 0, d
+	}
+}
+
+// platformServer names the platform API host for an error envelope.
+func platformServer(provider string) string {
+	switch provider {
+	case "FurryBox":
+		return "whois.furry.box"
+	case "SEUS":
+		return "s.eus"
+	default:
+		return ""
 	}
 }
 

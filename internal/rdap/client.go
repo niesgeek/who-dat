@@ -99,6 +99,13 @@ func (c *Client) get(ctx context.Context, n domain.Name, base string) (*model.Re
 		return stamp(notRegistered(n, base, body)), nil
 	case resp.StatusCode == http.StatusTooManyRequests:
 		return nil, &srcerr.RateLimited{RetryAfter: retryAfter(resp), Err: fmt.Errorf("rdap %s", base)}
+	case resp.StatusCode == http.StatusNotImplemented:
+		// 501 means "this server does not implement this query": some
+		// registries only serve part of their zone over RDAP (e.g.
+		// rdap.hostmaster.ua answers 501 for third-level pp.ua names). That
+		// is not a failure of the lookup, it is a missing source — the
+		// orchestrator falls back to WHOIS.
+		return nil, fmt.Errorf("%w: rdap %s status 501", srcerr.ErrNoSource, base)
 	default:
 		return nil, fmt.Errorf("%w: rdap status %d", srcerr.ErrUpstream, resp.StatusCode)
 	}

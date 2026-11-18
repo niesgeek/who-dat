@@ -213,20 +213,21 @@ components:
         error:
           type: object
           properties:
-            code: { type: string, example: INVALID_DOMAIN, description: "Error code. PLATFORM_NAMESPACE means the name lives in a platform namespace (for example DNSHE or FurryBox) and the registry holds no record for it; see platform for where to look instead." }
+            code: { type: string, example: INVALID_DOMAIN, description: "Error code. PLATFORM_NAMESPACE means the name lives in a platform namespace with no public query API (for example DNSHE) and the registry holds no record for it; see platform for where to look instead. PLATFORM_NOT_FOUND means the platform was queried and has no record for the name; see dns for whether the name is already live in DNS." }
             message: { type: string }
             query: { type: string }
-            source: { type: string, enum: [rdap, whois], description: Lookup backend that failed, when known. }
+            source: { type: string, enum: [rdap, whois, platform], description: Lookup backend that failed, when known. }
             server: { type: string, description: Upstream server queried, when known. }
             detail: { type: string, description: Underlying error detail, for diagnostics. }
             platform:
               type: object
-              description: Present only with PLATFORM_NAMESPACE.
+              description: Present with PLATFORM_NAMESPACE and PLATFORM_NOT_FOUND.
               properties:
                 name: { type: string, example: DNSHE }
                 url: { type: string, example: "https://www.dnshe.com/" }
                 suffix: { type: string, example: cc.cd }
                 hasLookup: { type: boolean, description: Whether the platform publishes a public lookup. }
+            dns: { type: boolean, description: "Present only with PLATFORM_NOT_FOUND. True when the name already answers NS queries in DNS (delegated elsewhere), false when it provably does not; absent when the check was inconclusive." }
     Result:
       type: object
       properties:
@@ -286,7 +287,7 @@ components:
         meta:
           type: object
           properties:
-            source: { type: string, enum: [rdap, whois] }
+            source: { type: string, enum: [rdap, whois, platform] }
             server: { type: [string, "null"] }
             fetchedAt: { type: string, format: date-time }
             cached: { type: boolean }
@@ -294,6 +295,14 @@ components:
             statusCode: { type: integer, description: Upstream HTTP status (RDAP), when known. }
             bytes: { type: integer, description: Size of the upstream payload in bytes. }
             conformance: { type: array, items: { type: string }, description: RDAP conformance classes from the response, when known. }
+        platform:
+          type: object
+          description: Present only on platform results (source "platform"): the record came from the platform's own API, not the registry.
+          properties:
+            name: { type: string, example: FurryBox }
+            url: { type: string, example: "https://www.furry.box/whois/" }
+            suffix: { type: string, example: owo.name }
+        permanent: { type: boolean, description: "True when the platform registered the name without an expiry date; dates.expires stays null." }
     Contact:
       type: object
       properties:

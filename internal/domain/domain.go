@@ -35,26 +35,76 @@ type PlatformNamespace struct {
 	HasLookup bool
 }
 
-// platformNamespaces maps platform-run suffixes to their operator. The DNSHE
-// entries have no public query interface; the FurryBox/Yunamo entries do.
+// platformNamespaces maps platform-run suffixes with no public query
+// interface to their operator. Names under these suffixes are refused by
+// Parse with a PlatformNamespaceError: the record lives with the platform,
+// not the registry, and there is no API to ask. Platforms that do publish a
+// query API (FurryBox, SEUS) are not listed here — they are queried by the
+// platform package instead of being refused.
 var platformNamespaces = map[string]PlatformNamespace{
-	"cc.cd":     {Suffix: "cc.cd", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "cc.cd", HasLookup: false},
-	"bot.cd":    {Suffix: "bot.cd", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "bot.cd", HasLookup: false},
-	"us.ci":     {Suffix: "us.ci", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "us.ci", HasLookup: false},
-	"de5.net":   {Suffix: "de5.net", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "de5.net", HasLookup: false},
-	"loc.cc":    {Suffix: "loc.cc", Name: "Yunamo", URL: "https://yunamo.com/", Parent: "loc.cc", HasLookup: true},
-	"paw.fm":    {Suffix: "paw.fm", Name: "FurryBox", URL: "https://www.furry.box/whois/", Parent: "paw.fm", HasLookup: true},
-	"end.ac":    {Suffix: "end.ac", Name: "FurryBox", URL: "https://www.furry.box/whois/", Parent: "end.ac", HasLookup: true},
-	"qwq.name":  {Suffix: "qwq.name", Name: "FurryBox", URL: "https://www.furry.box/whois/", Parent: "qwq.name", HasLookup: true},
-	"owo.name":  {Suffix: "owo.name", Name: "FurryBox", URL: "https://www.furry.box/whois/", Parent: "owo.name", HasLookup: true},
-	"site.tv":   {Suffix: "site.tv", Name: "FurryBox", URL: "https://www.furry.box/whois/", Parent: "site.tv", HasLookup: true},
-	"xwx.me":    {Suffix: "xwx.me", Name: "FurryBox", URL: "https://www.furry.box/whois/", Parent: "xwx.me", HasLookup: true},
-	"furry.box": {Suffix: "furry.box", Name: "FurryBox", URL: "https://www.furry.box/whois/", Parent: "furry.box", HasLookup: true},
+	"cc.cd":   {Suffix: "cc.cd", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "cc.cd", HasLookup: false},
+	"bot.cd":  {Suffix: "bot.cd", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "bot.cd", HasLookup: false},
+	"us.ci":   {Suffix: "us.ci", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "us.ci", HasLookup: false},
+	"de5.net": {Suffix: "de5.net", Name: "DNSHE", URL: "https://www.dnshe.com/", Parent: "de5.net", HasLookup: false},
+	// Yunamo publishes a query API, but its endpoint is not public (no CORS,
+	// no documented route); until it is found, names under loc.cc are refused
+	// here with a pointer to the platform instead of being queried.
+	"loc.cc": {Suffix: "loc.cc", Name: "Yunamo", URL: "https://yunamo.com/", Parent: "loc.cc", HasLookup: true},
 }
 
-// PlatformNamespaceError is returned by Parse when the host lives inside a
-// platform-run namespace. It carries the platform so callers can explain
-// where the record actually lives instead of calling the name unregistered.
+// furryBoxSuffixes are the namespaces FurryBox carved out of its own domains.
+// Names under them are platform records queried through the FurryBox API, not
+// registry records. The platform package owns the query; this list only tells
+// Parse where the registrable boundary sits (the PSL would collapse
+// "myname.owo.name" to "owo.name" and lose the label).
+var furryBoxSuffixes = map[string]bool{
+	"paw.fm": true, "end.ac": true, "qwq.name": true, "owo.name": true,
+	"site.tv": true, "xwx.me": true, "furry.box": true,
+}
+
+// FurryBoxSuffixFor returns the FurryBox namespace a host sits in, if any. The
+// parent domain itself is a normal registry record and does not match; only
+// names under it do.
+func FurryBoxSuffixFor(host string) (string, bool) {
+	host = strings.ToLower(strings.TrimSuffix(strings.TrimSpace(host), "."))
+	labels := strings.Split(host, ".")
+	for i := 1; i < len(labels); i++ {
+		if suf := strings.Join(labels[i:], "."); furryBoxSuffixes[suf] {
+			return suf, true
+		}
+	}
+	return "", false
+}
+
+// seusSuffixSnapshot is the SEUS BYOS directory as last seen (live list at
+// https://s.eus/api/domains/suffixes). The platform package fetches that list
+// live for routing; this snapshot only tells Parse where the registrable
+// boundary sits, so a SEUS name keeps its label instead of collapsing to the
+// parent in the PSL. Refresh it when the directory changes: a suffix missing
+// here parses as its parent and never reaches the platform lookup, while a
+// suffix that left SEUS still parses as a platform name and falls through to
+// RDAP for the parent TLD.
+var seusSuffixSnapshot = map[string]bool{
+	"fs.kg": true, "is-a.si": true, "us.mw": true, "bg5.net": true, "nastu.net": true,
+}
+
+// queryablePlatformSuffixFor returns the platform namespace a host sits in
+// when that platform publishes a query API (FurryBox, SEUS snapshot). The
+// parent domain itself does not match; only names under it do.
+func queryablePlatformSuffixFor(host string) (string, bool) {
+	if suf, ok := FurryBoxSuffixFor(host); ok {
+		return suf, true
+	}
+	host = strings.ToLower(strings.TrimSuffix(strings.TrimSpace(host), "."))
+	labels := strings.Split(host, ".")
+	for i := 1; i < len(labels); i++ {
+		if suf := strings.Join(labels[i:], "."); seusSuffixSnapshot[suf] {
+			return suf, true
+		}
+	}
+	return "", false
+}
+
 type PlatformNamespaceError struct {
 	Namespace PlatformNamespace
 	Host      string
@@ -104,6 +154,22 @@ func Parse(raw string) (Name, error) {
 	ascii, err := idna.Lookup.ToASCII(host)
 	if err != nil {
 		return Name{}, ErrInvalidDomain
+	}
+
+	// A name under a queryable platform suffix is a platform record, not a
+	// registry record: the registrable boundary is the label immediately
+	// before the platform suffix, and the suffix itself is the TLD. Without
+	// this the PSL would collapse "myname.owo.name" to "owo.name" and the
+	// queried name would be wrong.
+	if suffix, ok := queryablePlatformSuffixFor(ascii); ok {
+		labels := strings.Split(ascii, ".")
+		sufLabels := strings.Split(suffix, ".")
+		registrable := labels[len(labels)-len(sufLabels)-1] + "." + suffix
+		unicode, err := idna.Lookup.ToUnicode(registrable)
+		if err != nil {
+			unicode = registrable
+		}
+		return Name{ASCII: registrable, Unicode: unicode, TLD: suffix}, nil
 	}
 
 	registrable, err := publicsuffix.EffectiveTLDPlusOne(ascii)

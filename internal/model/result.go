@@ -10,9 +10,18 @@ import (
 
 // Source identifies which protocol produced a Result.
 const (
-	SourceRDAP  = "rdap"
-	SourceWhois = "whois"
+	SourceRDAP     = "rdap"
+	SourceWhois    = "whois"
+	SourcePlatform = "platform"
 )
+
+// PlatformInfo names the platform that actually holds a record, for names the
+// registry never sees (FurryBox, SEUS). Present only on platform results.
+type PlatformInfo struct {
+	Name   string `json:"name"`   // operator, e.g. "FurryBox"
+	URL    string `json:"url"`    // platform's own whois page
+	Suffix string `json:"suffix"` // namespace the name sits in, e.g. "owo.name"
+}
 
 // Result is the normalized response for a single domain lookup.
 type Result struct {
@@ -30,6 +39,13 @@ type Result struct {
 	Events        []Event      `json:"events"`
 	Contacts      Contacts     `json:"contacts"`
 	Meta          Meta         `json:"meta"`
+	// Platform names the platform that holds this record; nil for registry
+	// records. When set, Meta.Source is "platform" and the fields above were
+	// transcribed from the platform's own API, not from RDAP/WHOIS.
+	Platform *PlatformInfo `json:"platform,omitempty"`
+	// Permanent is true when the platform registered the name without an
+	// expiry date (FurryBox permanent records). Dates.Expires stays nil.
+	Permanent bool `json:"permanent,omitempty"`
 
 	// Raw and RawContentType carry the original upstream payload for ?raw=true. They are
 	// never serialized as part of the normalized result.

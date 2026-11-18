@@ -32,7 +32,7 @@ func (f *fakeSource) Lookup(context.Context, domain.Name) (*model.Result, error)
 // source always reports no source, so it never masks the RDAP outcome under test.
 func newTestServer(result *model.Result, err error) http.Handler {
 	cfg := &config.Config{LookupTimeout: 2_000_000_000, MaxDomains: 5} // 2s, no rate limit/auth
-	svc := lookup.NewService(&fakeSource{result: result, err: err}, &fakeSource{err: srcerr.ErrNoSource}, nil)
+	svc := lookup.NewService(&fakeSource{result: result, err: err}, &fakeSource{err: srcerr.ErrNoSource}, nil, nil)
 	return New(cfg, svc)
 }
 
@@ -110,7 +110,7 @@ func TestLookupErrorEnvelope(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svc := lookup.NewService(&fakeSource{err: tt.rdapErr}, &fakeSource{err: tt.whoisErr}, nil)
+			svc := lookup.NewService(&fakeSource{err: tt.rdapErr}, &fakeSource{err: tt.whoisErr}, nil, nil)
 			rec := httptest.NewRecorder()
 			New(&config.Config{LookupTimeout: 2_000_000_000, MaxDomains: 5}, svc).
 				ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/v1/whois/example.com", nil))
@@ -167,7 +167,7 @@ func rlServer() http.Handler {
 		RateBurst:     1,
 		APIKeys:       []string{"devkey"},
 	}
-	svc := lookup.NewService(&fakeSource{result: registered()}, &fakeSource{err: srcerr.ErrNoSource}, nil)
+	svc := lookup.NewService(&fakeSource{result: registered()}, &fakeSource{err: srcerr.ErrNoSource}, nil, nil)
 	return New(cfg, svc)
 }
 
@@ -240,7 +240,7 @@ func TestRateLimitWithoutBurst(t *testing.T) {
 // returns the given result/err.
 func cacheServer(result *model.Result, err error) http.Handler {
 	cfg := &config.Config{LookupTimeout: 2_000_000_000, MaxDomains: 5, CDNCacheControl: "public, s-maxage=3600"}
-	svc := lookup.NewService(&fakeSource{result: result, err: err}, &fakeSource{err: srcerr.ErrNoSource}, nil)
+	svc := lookup.NewService(&fakeSource{result: result, err: err}, &fakeSource{err: srcerr.ErrNoSource}, nil, nil)
 	return New(cfg, svc)
 }
 
@@ -459,7 +459,7 @@ func TestPriceEndpoint(t *testing.T) {
 	defer upstream.Close()
 
 	cfg := &config.Config{LookupTimeout: 2_000_000_000, MaxDomains: 5}
-	svc := lookup.NewService(&fakeSource{err: srcerr.ErrNoSource}, &fakeSource{err: srcerr.ErrNoSource}, nil)
+	svc := lookup.NewService(&fakeSource{err: srcerr.ErrNoSource}, &fakeSource{err: srcerr.ErrNoSource}, nil, nil)
 	s := newServer(cfg, svc)
 	s.prices = price.NewWithBase(upstream.Client(), upstream.URL, 5*time.Minute)
 	h := s.routes()

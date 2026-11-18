@@ -87,7 +87,7 @@ func main() {
 	}
 	fmt.Printf("Testing %d domains...\n", len(domains))
 
-	svc := lookup.NewService(rdap.NewClient(httpClient), whois.NewClient(), nil)
+	svc := lookup.NewService(rdap.NewClient(httpClient), whois.NewClient(), nil, nil)
 
 	start := time.Now()
 	reports := run(svc, domains, hosts, *workers, *timeout)

@@ -65,9 +65,11 @@ func TestParseErrors(t *testing.T) {
 	}
 }
 
-// TestParsePlatformNamespace: names inside a platform-run namespace must fail
-// with the platform attached, never collapse into a lookup of the parent
-// (which would misreport the name as unregistered).
+// TestParsePlatformNamespace: names inside a platform-run namespace with no
+// public query API must fail with the platform attached, never collapse into
+// a lookup of the parent (which would misreport the name as unregistered).
+// FurryBox names are deliberately absent here: they publish a query API and
+// are answered by the platform package instead of being refused.
 func TestParsePlatformNamespace(t *testing.T) {
 	tests := []struct {
 		in       string
@@ -76,8 +78,6 @@ func TestParsePlatformNamespace(t *testing.T) {
 		{"foo.cc.cd", "DNSHE"},
 		{"a.b.us.ci", "DNSHE"},
 		{"x.de5.net", "DNSHE"},
-		{"myname.owo.name", "FurryBox"},
-		{"site.xwx.me", "FurryBox"},
 		{"hello.loc.cc", "Yunamo"},
 	}
 	for _, tt := range tests {
@@ -105,6 +105,36 @@ func TestParsePlatformParentIsNormal(t *testing.T) {
 			if errors.As(err, &pe) {
 				t.Errorf("Parse(%q) wrongly flagged as platform namespace", in)
 			}
+		}
+	}
+}
+
+// TestParseQueryablePlatformParses: FurryBox names publish a query API, so
+// Parse must let them through to the platform lookup instead of refusing —
+// and must keep the label, not collapse to the parent the way the PSL would.
+func TestParseQueryablePlatformParses(t *testing.T) {
+	tests := []struct {
+		in, ascii, tld string
+	}{
+		{"myname.owo.name", "myname.owo.name", "owo.name"},
+		{"site.xwx.me", "site.xwx.me", "xwx.me"},
+		{"a.paw.fm", "a.paw.fm", "paw.fm"},
+		{"x.site.tv", "x.site.tv", "site.tv"},
+		{"deep.a.owo.name", "a.owo.name", "owo.name"},
+		{"domain.fs.kg", "domain.fs.kg", "fs.kg"},
+		{"a.bg5.net", "a.bg5.net", "bg5.net"},
+	}
+	for _, tt := range tests {
+		n, err := Parse(tt.in)
+		if err != nil {
+			t.Errorf("Parse(%q) err = %v, want nil (queryable platform)", tt.in, err)
+			continue
+		}
+		if n.ASCII != tt.ascii {
+			t.Errorf("Parse(%q).ASCII = %q, want %q", tt.in, n.ASCII, tt.ascii)
+		}
+		if n.TLD != tt.tld {
+			t.Errorf("Parse(%q).TLD = %q, want %q", tt.in, n.TLD, tt.tld)
 		}
 	}
 }

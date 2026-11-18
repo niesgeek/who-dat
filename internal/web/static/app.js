@@ -73,6 +73,7 @@
       "record.created": "创建",
       "record.updated": "更新",
       "record.expires": "到期",
+      "record.permanent": "永久（平台未设到期时间）",
       "record.statuses": "状态码",
       "record.statuses.hint": "EPP 状态，右侧是原文",
       "record.noStatus": "上游没有返回状态码",
@@ -161,6 +162,8 @@
       "due.to": "到期",
       "due.days": "天",
       "due.noExpiry": "这条记录没有到期日（例如永久注册），没有倒计时可画。",
+      "due.permanent": "永久",
+      "due.permanentFine": "这个名字在平台上没有到期时间。",
       "due.notRegistered": "这个域名未注册，没有到期日。",
       "due.suspended": "解析已暂停",
       "due.active": "解析正常",
@@ -184,6 +187,12 @@
       "source.platformBody": "注册局只登记到父域那层，这条记录只在平台内部，要去平台后台查。",
       "source.platformLookup": "去平台查询",
       "source.platformNoLookup": "这个平台没有公开的查询接口",
+      "source.platformLabel": "平台 API",
+      "source.protoPlatform": "HTTPS · 平台 API",
+      "source.finePlatform": "平台 API 记录：字段照平台原文转写，未做二次判定；注册局不登记这一层。",
+      "source.platformNotFound": "这个名字在平台的库里查不到，通常意味着在平台上还可以注册——真正注册前请在平台页面再确认一次。",
+      "source.platformNotFoundDns": "这个名字在平台的库里查不到，可它的 NS 已经有应答——多半是在别处委派或在用，不能当成空号。",
+      "source.platformNotFoundNoDns": "这个名字在平台的库里查不到，DNS 里也没有应答，通常意味着在平台上还可以注册。",
       "tl.title": "事件时间线",
       "tl.empty": "查询后按时间正序列出注册、变更、转移、到期这些节点，并标出距离现在多久。",
       "tl.count": "{n} 个节点",
@@ -214,6 +223,7 @@
       "price.at": "采于",
       "price.uncovered": "未收录",
       "price.fail": "价格数据没有取到（这不影响上面的注册局记录）。",
+      "price.skip": "平台命名空间的后缀没有公开比价数据。",
       "price.empty": "这家比价站还没有收录 .{tld} 的报价 —— 它收了上百家注册商、几千个后缀，但确实不是全部。",
       "price.fine": "价格来自哪煮米收录的注册商公开挂牌价；人民币由上游按参考汇率折算，券后价与标准价都按上游记录。最终以注册商结算页为准。",
       "price.loading": "查比价中…",
@@ -235,6 +245,9 @@
       "rel.month": "个月",
       "rel.year": "年",
       "err.PLATFORM_NAMESPACE": "这个名字在 {platform} 的平台命名空间里，注册局不登记这条记录，请去平台后台查",
+      "err.PLATFORM_NOT_FOUND": "平台里没有这条记录",
+      "err.PLATFORM_NOT_FOUND_DNS": "平台里没有记录，但这个名字在 DNS 里是活的",
+      "err.PLATFORM_NOT_FOUND_NODNS": "平台里没有记录，DNS 里也没有应答",
       "reg.yes": "已注册",
       "reg.no": "未注册",
       "source.rdap": "RDAP",
@@ -332,6 +345,7 @@
       "record.created": "Created",
       "record.updated": "Updated",
       "record.expires": "Expires",
+      "record.permanent": "Permanent (no expiry set by the platform)",
       "record.statuses": "Status codes",
       "record.statuses.hint": "EPP status, raw code on the right",
       "record.noStatus": "The upstream response had no status codes",
@@ -420,6 +434,8 @@
       "due.to": "Expires",
       "due.days": "days",
       "due.noExpiry": "This record has no expiry date (for example a permanent registration), so there is no countdown.",
+      "due.permanent": "Permanent",
+      "due.permanentFine": "This name has no expiry date on the platform.",
       "due.notRegistered": "This domain is not registered, so there is no expiry date.",
       "due.suspended": "Resolution suspended",
       "due.active": "Resolving normally",
@@ -443,6 +459,12 @@
       "source.platformBody": "The registry only records the parent domain; this record lives inside the platform. Check the platform's own records.",
       "source.platformLookup": "Check at the platform",
       "source.platformNoLookup": "This platform publishes no public lookup",
+      "source.platformLabel": "Platform API",
+      "source.protoPlatform": "HTTPS · Platform API",
+      "source.finePlatform": "Platform API record: fields transcribed from the platform's own payload, no second-guessing; the registry does not record this layer.",
+      "source.platformNotFound": "This name is absent from the platform's database, which usually means it is still available there. Confirm on the platform page before you register.",
+      "source.platformNotFoundDns": "This name is absent from the platform's database, yet its NS already answers — it is likely delegated elsewhere or in use, so do not treat it as free.",
+      "source.platformNotFoundNoDns": "This name is absent from the platform's database and has no DNS answer, which usually means it is still available there.",
       "tl.title": "Event timeline",
       "tl.empty": "After a lookup, registration, changes, transfers, and expiry are listed oldest first, each with its distance from now.",
       "tl.count": "{n} events",
@@ -473,6 +495,7 @@
       "price.at": "collected",
       "price.uncovered": "Not covered",
       "price.fail": "Price data did not come back (the registry record above is unaffected).",
+      "price.skip": "Platform-namespace suffixes have no public price comparison.",
       "price.empty": "This comparison site does not list prices for .{tld} yet — it covers over a hundred registrars and thousands of suffixes, but not all of them.",
       "price.fine": "Prices are public registrar lists collected by nazhumi.com; CNY figures use its reference conversion, and coupon and list prices are as recorded upstream. The registrar's checkout page is final.",
       "price.loading": "Checking prices…",
@@ -494,6 +517,9 @@
       "rel.month": "month",
       "rel.year": "year",
       "err.PLATFORM_NAMESPACE": "This name sits in {platform}'s platform namespace; the registry does not record it. Check the platform instead",
+      "err.PLATFORM_NOT_FOUND": "No record on this platform",
+      "err.PLATFORM_NOT_FOUND_DNS": "Not on the platform, but live in DNS",
+      "err.PLATFORM_NOT_FOUND_NODNS": "No record on the platform, and no DNS answer",
       "reg.yes": "Registered",
       "reg.no": "Not registered",
       "source.rdap": "RDAP",
@@ -529,6 +555,7 @@
 
   var STATUS_GLOSS = {
     ok: { zh: "正常", en: "OK" },
+    permanent: { zh: "永久", en: "Permanent" },
     inactive: { zh: "未激活", en: "Inactive" },
     clientTransferProhibited: { zh: "禁止转移", en: "Transfer locked" },
     clientDeleteProhibited: { zh: "禁止删除", en: "Delete locked" },
@@ -635,6 +662,7 @@
      The record card keeps the two-word gloss; this table is the long form. */
   var STATUS_MEAN = {
     ok: { zh: "域名正常生效，没有额外限制。", en: "Domain is live with no extra restrictions." },
+    permanent: { zh: "平台永久注册，没有到期时间。", en: "Permanent registration on the platform, no expiry." },
     active: { zh: "域名正常生效，解析可用。", en: "Domain is live and resolvable." },
     inactive: { zh: "域名未配置可用的域名服务器，解析不通。", en: "No working nameservers configured; it will not resolve." },
     clientTransferProhibited: { zh: "注册商侧禁止转移：别人不能把它未经你同意转出。这是好事，新注册和刚续费的域名普遍带着它。", en: "Registrar-side transfer lock: nobody can move it away without you. This is good — most new and recently renewed names carry it." },
@@ -753,6 +781,7 @@
 
   function sourceText(meta) {
     if (!meta || !meta.source) return "";
+    if (meta.source === "platform") return t("source.platformLabel");
     var label = t("source." + meta.source);
     return label === "source." + meta.source ? meta.source : label;
   }
@@ -761,6 +790,11 @@
     if (!err) return t("err.generic");
     if (err.code === "PLATFORM_NAMESPACE" && err.platform && err.platform.name) {
       return t("err.PLATFORM_NAMESPACE").replace("{platform}", err.platform.name);
+    }
+    if (err.code === "PLATFORM_NOT_FOUND") {
+      if (err.dns === true) return t("err.PLATFORM_NOT_FOUND_DNS");
+      if (err.dns === false) return t("err.PLATFORM_NOT_FOUND_NODNS");
+      return t("err.PLATFORM_NOT_FOUND");
     }
     if (err.code && I18N[state.lang]["err." + err.code]) return t("err." + err.code);
     return err.message || t("err.generic");
@@ -975,7 +1009,7 @@
       reg.abusePhone ? kvRow(t("record.abusePhone"), reg.abusePhone) : null,
       kvRow(t("record.created"), fmtDate(dates.created)),
       kvRow(t("record.updated"), fmtDate(dates.updated)),
-      kvRow(t("record.expires"), fmtDate(dates.expires))
+      kvRow(t("record.expires"), r.permanent ? t("record.permanent") : fmtDate(dates.expires))
     ];
     var kv = el("dl", { class: "kv kv-2" }, rows);
 
@@ -1122,8 +1156,10 @@
   function paintSource() {
     var host = $("sourceBody");
     var badge = $("sourceBadge");
+    var fine = $("sourceFine");
     var r = state.result;
     var err = state.error;
+    if (fine) fine.textContent = t("source.fine");
     if (err && err.code === "UNSUPPORTED_TLD") {
       badge.textContent = t("source.badge.wait");
       badge.className = "badge badge-grey";
@@ -1149,6 +1185,24 @@
       host.replaceChildren(el("div", { class: "empty" }, kids));
       return;
     }
+    // The platform answered and the name is not in its database. That is a
+    // real answer, not a failure — and the DNS check says whether the name is
+    // already live elsewhere despite the miss.
+    if (err && err.code === "PLATFORM_NOT_FOUND") {
+      var p = err.platform || {};
+      badge.textContent = (p.name || "PLATFORM").toUpperCase();
+      badge.className = "badge badge-coral";
+      var body = err.dns === true ? t("source.platformNotFoundDns")
+        : err.dns === false ? t("source.platformNotFoundNoDns")
+        : t("source.platformNotFound");
+      var nfKids = [
+        el("strong", { text: t("err.PLATFORM_NOT_FOUND") }),
+        el("p", { text: body })
+      ];
+      if (p.url) nfKids.push(el("a", { href: p.url, target: "_blank", rel: "noopener noreferrer", text: t("source.platformLookup") }));
+      host.replaceChildren(el("div", { class: "empty" }, nfKids));
+      return;
+    }
     if (!r) {
       badge.textContent = t("source.badge.wait");
       badge.className = "badge badge-grey";
@@ -1162,8 +1216,10 @@
     var src = sourceText(meta);
     badge.textContent = src ? src.toUpperCase() : t("source.badge.wait");
     badge.className = "badge badge-lime";
+    if (fine && r.platform) fine.textContent = t("source.finePlatform");
     var proto = "";
     if (meta.source === "whois") proto = t("source.protoWhois");
+    else if (meta.source === "platform") proto = t("source.protoPlatform");
     else if (meta.conformance && meta.conformance.length) {
       proto = t("source.protoRdap") + " · " + meta.conformance[0] + (meta.conformance.length > 1 ? " +" + (meta.conformance.length - 1) : "");
     } else proto = t("source.protoRdap");
@@ -1198,6 +1254,18 @@
       badge.textContent = t("due.badge.none");
       badge.className = "badge badge-grey";
       host.replaceChildren(el("p", { class: "fine", text: t("due.notRegistered") }));
+      return;
+    }
+    if (r.permanent) {
+      badge.textContent = t("due.permanent");
+      badge.className = "badge badge-lime";
+      host.replaceChildren(
+        el("div", { class: "due-top" }, [
+          el("div", { text: t("due.remaining") }),
+          el("div", { class: "due-num" }, [el("span", { text: t("due.permanent") })])
+        ]),
+        el("p", { class: "fine", text: t("due.permanentFine") })
+      );
       return;
     }
     if (!dates.expires) {
@@ -1373,6 +1441,12 @@
           el("div", { class: "price-num is-na", text: "…" })
         ]);
       })));
+      return;
+    }
+    if (p.skipped) {
+      badge.textContent = "—";
+      badge.className = "badge badge-grey";
+      host.replaceChildren(el("div", { class: "empty" }, [el("p", { text: t("price.skip") })]));
       return;
     }
     if (p.error || !p.data) {
@@ -1654,6 +1728,7 @@
           wrapped.code = err.code || "";
           wrapped.detail = err.detail || "";
           wrapped.platform = err.platform || null;
+          wrapped.dns = err.dns;
           throw wrapped;
         }
         if (!data) {
@@ -1699,7 +1774,10 @@
       state.rawText = "";
       state.rawLoading = false;
       remember(data.domain || q);
-      loadPrice(data);
+      // Platform namespaces have no public price comparison; the record above
+      // is the whole answer.
+      if (data.platform) state.price = { skipped: true };
+      else loadPrice(data);
       loadRaw(data);
     }, function (err) {
       if (err && err.name === "AbortError") return;

@@ -29,7 +29,7 @@ var testName = domain.Name{ASCII: "example.com", Unicode: "example.com", TLD: "c
 func TestLookupUsesRDAPFirst(t *testing.T) {
 	rdap := &fakeSource{result: model.New("example.com", "example.com", "com")}
 	whois := &fakeSource{}
-	got, err := NewService(rdap, whois, nil).Lookup(context.Background(), testName)
+	got, err := NewService(rdap, whois, nil, nil).Lookup(context.Background(), testName)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -41,7 +41,7 @@ func TestLookupUsesRDAPFirst(t *testing.T) {
 func TestLookupFallsBackToWHOIS(t *testing.T) {
 	rdap := &fakeSource{err: srcerr.ErrNoSource}
 	whois := &fakeSource{result: model.New("example.de", "example.de", "de")}
-	got, err := NewService(rdap, whois, nil).Lookup(context.Background(), testName)
+	got, err := NewService(rdap, whois, nil, nil).Lookup(context.Background(), testName)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -53,7 +53,7 @@ func TestLookupFallsBackToWHOIS(t *testing.T) {
 func TestLookupFallbackErrorIsAnnotated(t *testing.T) {
 	rdap := &fakeSource{err: srcerr.ErrNoSource}
 	whois := &fakeSource{err: srcerr.ErrTimeout}
-	_, err := NewService(rdap, whois, nil).Lookup(context.Background(), testName)
+	_, err := NewService(rdap, whois, nil, nil).Lookup(context.Background(), testName)
 
 	if !errors.Is(err, srcerr.ErrTimeout) {
 		t.Fatalf("err = %v, want ErrTimeout preserved through annotation", err)
@@ -66,7 +66,7 @@ func TestLookupFallbackErrorIsAnnotated(t *testing.T) {
 func TestLookupPropagatesUpstreamError(t *testing.T) {
 	rdap := &fakeSource{err: srcerr.ErrUpstream}
 	whois := &fakeSource{}
-	_, err := NewService(rdap, whois, nil).Lookup(context.Background(), testName)
+	_, err := NewService(rdap, whois, nil, nil).Lookup(context.Background(), testName)
 	if !errors.Is(err, srcerr.ErrUpstream) {
 		t.Fatalf("err = %v, want ErrUpstream", err)
 	}
@@ -78,7 +78,7 @@ func TestLookupPropagatesUpstreamError(t *testing.T) {
 func TestLookupCacheHit(t *testing.T) {
 	rdap := &fakeSource{result: model.New("example.com", "example.com", "com")}
 	whois := &fakeSource{}
-	svc := NewService(rdap, whois, cache.New(time.Minute))
+	svc := NewService(rdap, whois, cache.New(time.Minute), nil)
 
 	if _, err := svc.Lookup(context.Background(), testName); err != nil {
 		t.Fatalf("first lookup: %v", err)

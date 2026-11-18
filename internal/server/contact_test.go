@@ -21,7 +21,7 @@ func contactApp(cfg *config.Config) *server {
 	if cfg.MaxDomains == 0 {
 		cfg.MaxDomains = 5
 	}
-	svc := lookup.NewService(&fakeSource{err: srcerr.ErrNoSource}, &fakeSource{err: srcerr.ErrNoSource}, nil)
+	svc := lookup.NewService(&fakeSource{err: srcerr.ErrNoSource}, &fakeSource{err: srcerr.ErrNoSource}, nil, nil)
 	return newServer(cfg, svc)
 }
 

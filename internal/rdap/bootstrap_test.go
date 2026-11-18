@@ -19,6 +19,16 @@ func TestSeedsAreSane(t *testing.T) {
 			}
 		}
 	}
+	for tld, urls := range overrides {
+		if tld != strings.ToLower(tld) || len(urls) == 0 {
+			t.Errorf("override %q: TLDs are lowercase and need at least one URL", tld)
+		}
+		for _, u := range urls {
+			if !strings.HasPrefix(u, "https://") || !strings.HasSuffix(u, "/") {
+				t.Errorf("override %q: %q must be https and end with /", tld, u)
+			}
+		}
+	}
 	for suffix, urls := range suffixSeeds {
 		if suffix != strings.ToLower(suffix) || len(urls) == 0 {
 			t.Errorf("suffix seed %q: suffixes are lowercase and need at least one URL", suffix)
@@ -32,8 +42,9 @@ func TestSeedsAreSane(t *testing.T) {
 }
 
 func TestBootstrapSeeds(t *testing.T) {
-	// Fake IANA registry: knows com, and claims ch (so the seed must lose).
-	iana := `{"services":[[["com"],["https://rdap.verisign.com/com/v1/"]],[["ch"],["https://iana.example/"]]]}`
+	// Fake IANA registry: knows com, and claims ch (so the seed must lose)
+	// and kg over http (so the https override must win).
+	iana := `{"services":[[["com"],["https://rdap.verisign.com/com/v1/"]],[["ch"],["https://iana.example/"]],[["kg"],["http://rdap.cctld.kg/"]]]}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte(iana))
 	}))
@@ -48,6 +59,8 @@ func TestBootstrapSeeds(t *testing.T) {
 		{"example.com", "https://rdap.verisign.com/com/v1/"}, // business as usual
 		{"example.co.lu", "https://rdap.cctld.com/"},         // second-level suffix seed
 		{"example.wz.org", "https://rdap.cctld.com/"},        // second-level suffix seed
+		{"example.qa", "https://rdap.registry.qa/rdap/"},     // seed fills the gap (IANA lists no RDAP for .qa)
+		{"example.kg", "https://rdap.cctld.kg/"},             // override beats IANA's http entry
 	}
 	for _, tt := range tests {
 		urls, err := b.serversFor(context.Background(), tt.domain)

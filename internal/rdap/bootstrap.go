@@ -53,6 +53,7 @@ var seeds = map[string][]string{
 	"mz":               {"https://rdap.nic.mz/"},
 	"om":               {"https://rdap.registry.om/"},
 	"pr":               {"https://rdap.identitydigital.services/rdap/"},
+	"qa":               {"https://rdap.registry.qa/rdap/"}, // verified live 2026-11-18; IANA lists no RDAP for .qa
 	"ru":               {"https://cctld.ru/tci-ripn-rdap/"},
 	"sb":               {"https://rdap.nic.sb/"},
 	"sc":               {"https://rdap.identitydigital.services/rdap/"},
@@ -69,6 +70,15 @@ var seeds = map[string][]string{
 	"xn--kprw13d":      {"https://ccrdap.twnic.tw/taiwan/"},               // Taiwan IDN, twin of IANA-listed xn--kpry57d
 	"xn--mgbcpq6gpa1a": {"https://rdap.centralnic.com/xn--mgbcpq6gpa1a/"}, // Bahrain IDN
 	"xn--p1ai":         {"https://cctld.ru/tci-ripn-rdap/"},               // Cyrillic .rf
+}
+
+// overrides replaces IANA entries that are wrong in the registry itself, rather
+// than merely missing. Applied after seeds, so these win over IANA.
+var overrides = map[string][]string{
+	// IANA lists http://rdap.cctld.kg/ for .kg; the registry serves the same
+	// RDAP over https (verified live 2026-11-18), and plain http is rejected
+	// by the sandbox egress and by registries that redirect to https.
+	"kg": {"https://rdap.cctld.kg/"},
 }
 
 // suffixSeeds covers second-level suffixes whose registry runs its own RDAP
@@ -180,6 +190,9 @@ func (b *bootstrap) fetch(ctx context.Context) error {
 		if _, ok := services[tld]; !ok {
 			services[tld] = urls
 		}
+	}
+	for tld, urls := range overrides {
+		services[tld] = urls
 	}
 
 	b.mu.Lock()

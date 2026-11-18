@@ -12,6 +12,7 @@ import (
 	"github.com/lissy93/who-dat/internal/config"
 	"github.com/lissy93/who-dat/internal/dnsq"
 	"github.com/lissy93/who-dat/internal/lookup"
+	"github.com/lissy93/who-dat/internal/platform"
 	"github.com/lissy93/who-dat/internal/price"
 	"github.com/lissy93/who-dat/internal/rdap"
 	"github.com/lissy93/who-dat/internal/web"
@@ -51,7 +52,15 @@ func Build(cfg *config.Config) http.Handler {
 	if cfg.EnableCache {
 		c = cache.New(cfg.CacheTTL)
 	}
-	svc := lookup.NewService(rdap.NewClient(httpClient), whois.NewClient(), c)
+	// Platform lookups (FurryBox, SEUS) run before RDAP: those names are not
+	// registry records.
+	plat := platform.NewRouter(
+		platform.NewFurryClient(httpClient),
+		platform.NewSeusClient(httpClient),
+		platform.NewSeusDirectory(httpClient),
+		dnsq.New(cfg.DNSTimeout),
+	)
+	svc := lookup.NewService(rdap.NewClient(httpClient), whois.NewClient(), c, plat)
 	return New(cfg, svc)
 }
 
