@@ -36,6 +36,27 @@ Registrant:       f****m@hotmail.com
 % https://www.furry.box/whois
 `
 
+const furryActive = `% whois.furry.box
+% Query: z.site.tv
+
+Domain Name:      z.site.tv
+Registry:         FurryBox
+Suffix:           site.tv
+Status:           active
+Created:          2026-11-14 17:13:59 UTC
+Expires:          2027-11-14 17:13:59 UTC
+DNS Records:      0
+Name Servers:     ns1.furrydns.com
+                  ns2.furrydns.com
+                  (FurryBox default)
+
+Registrant:       not disclosed
+% The owner has not opted in to WHOIS disclosure.
+
+% Queried at 2026-11-18 02:24:19 UTC
+% https://www.furry.box/whois
+`
+
 const furryNotFound = `% whois.furry.box
 % Query: zzz.owo.name
 
@@ -108,6 +129,37 @@ func TestFurryFound(t *testing.T) {
 	}
 	if len(res.Raw) == 0 || res.RawContentType == "" {
 		t.Errorf("raw payload missing")
+	}
+}
+
+// TestFurryActive covers a normal (non-permanent) record: an expiry date and
+// a Registrant line that is not an address ("not disclosed") must not be
+// stored as an email.
+func TestFurryActive(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte(furryActive))
+	}))
+	defer ts.Close()
+
+	c := NewFurryClient(ts.Client())
+	c.endpoint = ts.URL + "/"
+	n, _ := domain.Parse("z.site.tv")
+	res, err := c.Lookup(context.Background(), n, "site.tv")
+	if err != nil {
+		t.Fatalf("Lookup: %v", err)
+	}
+	if !res.IsRegistered || res.Permanent {
+		t.Errorf("registered = %v permanent = %v, want registered non-permanent", res.IsRegistered, res.Permanent)
+	}
+	if res.Status[0] != "active" {
+		t.Errorf("status = %v, want [active]", res.Status)
+	}
+	if res.Dates.Expires == nil || res.Dates.Expires.Format("2006-01-02") != "2027-11-14" {
+		t.Errorf("expires = %v, want 2027-11-14", res.Dates.Expires)
+	}
+	if res.Contacts.Registrant.Email != nil || !res.Contacts.Registrant.Redacted {
+		t.Errorf("registrant = %+v, want no email and redacted", res.Contacts.Registrant)
 	}
 }
 

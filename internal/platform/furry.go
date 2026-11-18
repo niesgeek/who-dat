@@ -141,9 +141,11 @@ func mapFurry(n domain.Name, suffix string, fields map[string][]string, rawText 
 	if r.Dates.Expires != nil {
 		r.Events = append(r.Events, model.Event{Action: "expiration", Date: r.Dates.Expires})
 	}
-	if email := first("Registrant"); email != "" {
+	if email := first("Registrant"); strings.Contains(email, "@") {
 		// The platform masks the address itself (e.g. f****m@hotmail.com);
-		// what it chose to show is safe to repeat.
+		// what it chose to show is safe to repeat. Any other value — the
+		// usual one is "not disclosed" — is not an address and must not be
+		// stored as one; the contact stays redacted.
 		r.Contacts.Registrant.Email = model.Str(email)
 		r.Contacts.Registrant.Redacted = false
 	}
